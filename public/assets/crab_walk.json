@@ -1,0 +1,251 @@
+{
+	"textures": [
+		{
+			"image": "crab_walk.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1905,
+				"h": 106
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "crab_18.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 172,
+						"h": 104
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 172,
+						"h": 104
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 172,
+						"h": 104
+					}
+				},
+				{
+					"filename": "crab_16.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 172,
+						"h": 102
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 172,
+						"h": 102
+					},
+					"frame": {
+						"x": 175,
+						"y": 1,
+						"w": 172,
+						"h": 102
+					}
+				},
+				{
+					"filename": "crab_17.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 169,
+						"h": 102
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 169,
+						"h": 102
+					},
+					"frame": {
+						"x": 349,
+						"y": 1,
+						"w": 169,
+						"h": 102
+					}
+				},
+				{
+					"filename": "crab_15.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 174,
+						"h": 100
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 174,
+						"h": 100
+					},
+					"frame": {
+						"x": 520,
+						"y": 1,
+						"w": 174,
+						"h": 100
+					}
+				},
+				{
+					"filename": "crab_13.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 174,
+						"h": 99
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 174,
+						"h": 99
+					},
+					"frame": {
+						"x": 696,
+						"y": 1,
+						"w": 174,
+						"h": 99
+					}
+				},
+				{
+					"filename": "crab_14.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 169,
+						"h": 99
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 169,
+						"h": 99
+					},
+					"frame": {
+						"x": 872,
+						"y": 1,
+						"w": 169,
+						"h": 99
+					}
+				},
+				{
+					"filename": "crab_12.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 170,
+						"h": 98
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 170,
+						"h": 98
+					},
+					"frame": {
+						"x": 1043,
+						"y": 1,
+						"w": 170,
+						"h": 98
+					}
+				},
+				{
+					"filename": "crab_11.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 171,
+						"h": 97
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 171,
+						"h": 97
+					},
+					"frame": {
+						"x": 1215,
+						"y": 1,
+						"w": 171,
+						"h": 97
+					}
+				},
+				{
+					"filename": "crab_10.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 170,
+						"h": 96
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 170,
+						"h": 96
+					},
+					"frame": {
+						"x": 1388,
+						"y": 1,
+						"w": 170,
+						"h": 96
+					}
+				},
+				{
+					"filename": "crab_08.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 171,
+						"h": 94
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 171,
+						"h": 94
+					},
+					"frame": {
+						"x": 1560,
+						"y": 1,
+						"w": 171,
+						"h": 94
+					}
+				},
+				{
+					"filename": "crab_09.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 171,
+						"h": 94
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 171,
+						"h": 94
+					},
+					"frame": {
+						"x": 1733,
+						"y": 1,
+						"w": 171,
+						"h": 94
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:ee6762cc1cf1443e23b93b61dce91ba7:fa56ab60a35c235f3d1e3f5221e16e4c:e59a8802abf50ece81ca062ee754bbdc$"
+	}
+}

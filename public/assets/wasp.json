@@ -1,0 +1,797 @@
+{
+	"textures": [
+		{
+			"image": "wasp.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1064,
+				"h": 128
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "wasp_30.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 59,
+						"h": 65
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 59,
+						"h": 65
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 59,
+						"h": 65
+					}
+				},
+				{
+					"filename": "wasp_13.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 57,
+						"h": 59
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 57,
+						"h": 59
+					},
+					"frame": {
+						"x": 1,
+						"y": 68,
+						"w": 57,
+						"h": 59
+					}
+				},
+				{
+					"filename": "wasp_36.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 59,
+						"h": 65
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 59,
+						"h": 65
+					},
+					"frame": {
+						"x": 62,
+						"y": 1,
+						"w": 59,
+						"h": 65
+					}
+				},
+				{
+					"filename": "wasp_32.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 58,
+						"h": 65
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 58,
+						"h": 65
+					},
+					"frame": {
+						"x": 123,
+						"y": 1,
+						"w": 58,
+						"h": 65
+					}
+				},
+				{
+					"filename": "wasp_33.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 58,
+						"h": 65
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 58,
+						"h": 65
+					},
+					"frame": {
+						"x": 183,
+						"y": 1,
+						"w": 58,
+						"h": 65
+					}
+				},
+				{
+					"filename": "wasp_34.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 58,
+						"h": 65
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 58,
+						"h": 65
+					},
+					"frame": {
+						"x": 243,
+						"y": 1,
+						"w": 58,
+						"h": 65
+					}
+				},
+				{
+					"filename": "wasp_37.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 58,
+						"h": 65
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 58,
+						"h": 65
+					},
+					"frame": {
+						"x": 303,
+						"y": 1,
+						"w": 58,
+						"h": 65
+					}
+				},
+				{
+					"filename": "wasp_18.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 59,
+						"h": 62
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 59,
+						"h": 62
+					},
+					"frame": {
+						"x": 363,
+						"y": 1,
+						"w": 59,
+						"h": 62
+					}
+				},
+				{
+					"filename": "wasp_20.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 59,
+						"h": 62
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 59,
+						"h": 62
+					},
+					"frame": {
+						"x": 363,
+						"y": 65,
+						"w": 59,
+						"h": 62
+					}
+				},
+				{
+					"filename": "wasp_21.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 58,
+						"h": 62
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 58,
+						"h": 62
+					},
+					"frame": {
+						"x": 424,
+						"y": 1,
+						"w": 58,
+						"h": 62
+					}
+				},
+				{
+					"filename": "wasp_19.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 54,
+						"h": 62
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 54,
+						"h": 62
+					},
+					"frame": {
+						"x": 424,
+						"y": 65,
+						"w": 54,
+						"h": 62
+					}
+				},
+				{
+					"filename": "wasp_15.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 53,
+						"h": 62
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 53,
+						"h": 62
+					},
+					"frame": {
+						"x": 480,
+						"y": 65,
+						"w": 53,
+						"h": 62
+					}
+				},
+				{
+					"filename": "wasp_16.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 53,
+						"h": 62
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 53,
+						"h": 62
+					},
+					"frame": {
+						"x": 484,
+						"y": 1,
+						"w": 53,
+						"h": 62
+					}
+				},
+				{
+					"filename": "wasp_17.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 53,
+						"h": 62
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 53,
+						"h": 62
+					},
+					"frame": {
+						"x": 535,
+						"y": 65,
+						"w": 53,
+						"h": 62
+					}
+				},
+				{
+					"filename": "wasp_22.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 50,
+						"h": 62
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 50,
+						"h": 62
+					},
+					"frame": {
+						"x": 539,
+						"y": 1,
+						"w": 50,
+						"h": 62
+					}
+				},
+				{
+					"filename": "wasp_35.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 54,
+						"h": 65
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 54,
+						"h": 65
+					},
+					"frame": {
+						"x": 591,
+						"y": 1,
+						"w": 54,
+						"h": 65
+					}
+				},
+				{
+					"filename": "wasp_11.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 59,
+						"h": 55
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 59,
+						"h": 55
+					},
+					"frame": {
+						"x": 60,
+						"y": 68,
+						"w": 59,
+						"h": 55
+					}
+				},
+				{
+					"filename": "wasp_12.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 59,
+						"h": 55
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 59,
+						"h": 55
+					},
+					"frame": {
+						"x": 647,
+						"y": 1,
+						"w": 59,
+						"h": 55
+					}
+				},
+				{
+					"filename": "wasp_09.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 59,
+						"h": 54
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 59,
+						"h": 54
+					},
+					"frame": {
+						"x": 121,
+						"y": 68,
+						"w": 59,
+						"h": 54
+					}
+				},
+				{
+					"filename": "wasp_10.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 59,
+						"h": 54
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 59,
+						"h": 54
+					},
+					"frame": {
+						"x": 708,
+						"y": 1,
+						"w": 59,
+						"h": 54
+					}
+				},
+				{
+					"filename": "wasp_08.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 58,
+						"h": 53
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 58,
+						"h": 53
+					},
+					"frame": {
+						"x": 182,
+						"y": 68,
+						"w": 58,
+						"h": 53
+					}
+				},
+				{
+					"filename": "wasp_05.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 58,
+						"h": 52
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 58,
+						"h": 52
+					},
+					"frame": {
+						"x": 769,
+						"y": 1,
+						"w": 58,
+						"h": 52
+					}
+				},
+				{
+					"filename": "wasp_06.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 58,
+						"h": 52
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 58,
+						"h": 52
+					},
+					"frame": {
+						"x": 242,
+						"y": 68,
+						"w": 58,
+						"h": 52
+					}
+				},
+				{
+					"filename": "wasp_01.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 59,
+						"h": 50
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 59,
+						"h": 50
+					},
+					"frame": {
+						"x": 302,
+						"y": 68,
+						"w": 59,
+						"h": 50
+					}
+				},
+				{
+					"filename": "wasp_07.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 58,
+						"h": 52
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 58,
+						"h": 52
+					},
+					"frame": {
+						"x": 829,
+						"y": 1,
+						"w": 58,
+						"h": 52
+					}
+				},
+				{
+					"filename": "wasp_02.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 58,
+						"h": 51
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 58,
+						"h": 51
+					},
+					"frame": {
+						"x": 889,
+						"y": 1,
+						"w": 58,
+						"h": 51
+					}
+				},
+				{
+					"filename": "wasp_04.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 58,
+						"h": 51
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 58,
+						"h": 51
+					},
+					"frame": {
+						"x": 949,
+						"y": 1,
+						"w": 58,
+						"h": 51
+					}
+				},
+				{
+					"filename": "wasp_14.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 54,
+						"h": 60
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 54,
+						"h": 60
+					},
+					"frame": {
+						"x": 1009,
+						"y": 1,
+						"w": 54,
+						"h": 60
+					}
+				},
+				{
+					"filename": "wasp_03.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 56,
+						"h": 52
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 56,
+						"h": 52
+					},
+					"frame": {
+						"x": 590,
+						"y": 68,
+						"w": 56,
+						"h": 52
+					}
+				},
+				{
+					"filename": "wasp_23.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 51,
+						"h": 63
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 51,
+						"h": 63
+					},
+					"frame": {
+						"x": 648,
+						"y": 58,
+						"w": 51,
+						"h": 63
+					}
+				},
+				{
+					"filename": "wasp_29.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 50,
+						"h": 64
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 50,
+						"h": 64
+					},
+					"frame": {
+						"x": 701,
+						"y": 63,
+						"w": 50,
+						"h": 64
+					}
+				},
+				{
+					"filename": "wasp_31.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 50,
+						"h": 64
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 50,
+						"h": 64
+					},
+					"frame": {
+						"x": 753,
+						"y": 63,
+						"w": 50,
+						"h": 64
+					}
+				},
+				{
+					"filename": "wasp_25.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 49,
+						"h": 64
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 49,
+						"h": 64
+					},
+					"frame": {
+						"x": 805,
+						"y": 63,
+						"w": 49,
+						"h": 64
+					}
+				},
+				{
+					"filename": "wasp_27.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 49,
+						"h": 64
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 49,
+						"h": 64
+					},
+					"frame": {
+						"x": 856,
+						"y": 63,
+						"w": 49,
+						"h": 64
+					}
+				},
+				{
+					"filename": "wasp_24.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 51,
+						"h": 63
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 51,
+						"h": 63
+					},
+					"frame": {
+						"x": 907,
+						"y": 54,
+						"w": 51,
+						"h": 63
+					}
+				},
+				{
+					"filename": "wasp_26.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 50,
+						"h": 63
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 50,
+						"h": 63
+					},
+					"frame": {
+						"x": 960,
+						"y": 63,
+						"w": 50,
+						"h": 63
+					}
+				},
+				{
+					"filename": "wasp_28.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 50,
+						"h": 63
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 50,
+						"h": 63
+					},
+					"frame": {
+						"x": 1012,
+						"y": 63,
+						"w": 50,
+						"h": 63
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:b6fb754eb3d737328044c31d1aa8c87e:f46547123cd80e704435457d7a12cfd2:12382cf010346c659bb13e12216c0f44$"
+	}
+}
