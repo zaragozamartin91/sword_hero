@@ -1,12 +1,12 @@
-import AssetLoader from './AssetLoader';
+import AssetLoader from './AssetLoader'
 
-class Preloader {
+export default class Preloader {
     /**
      * Preloader base de los assets del juego
      * @param {Phaser.Scene} scene Escena del juego
      */
     constructor(scene) {
-        this.scene = scene;
+        this.scene = scene
     }
 
     init() {
@@ -21,7 +21,10 @@ class Preloader {
             this.scene.load.multiatlas('sonic3', 'assets/sonic3.json', 'assets')
 
             // this.scene.load.image('background' , 'assets/background.png')
-            this.scene.load.image('background', 'assets/angel_island_cloud.png')
+            // this.scene.load.image('background', 'assets/angel_island_cloud.png') MEH...
+            this.scene.load.image('background', 'assets/industrial-background.jpeg') // LOOKS GOOD
+            // this.scene.load.image('background', 'assets/white-metal-panels.jpeg') LOOKS BAD!
+            // this.scene.load.image('background', 'assets/stone-wall.jpeg') // SORTA WORKS...
 
             this.scene.load.multiatlas('sparkle', 'assets/sparkle.json', 'assets')
             this.scene.load.multiatlas('explosion', 'assets/explosion.json', 'assets')
@@ -49,6 +52,3 @@ class Preloader {
         });
     }
 }
-
-
-export default Preloader;

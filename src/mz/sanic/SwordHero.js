@@ -2,31 +2,31 @@
 
 import AssetLoader from './AssetLoader'
 
-const MAX_SPEED_X = 400;
-const MAX_SPEED_Y = 1100;
+const MAX_SPEED_X = 400
+const MAX_SPEED_Y = 1100
 
 /* Aceleracion del jugador mientras camina */
-const ACCEL = MAX_SPEED_X * 0.90;
-const HALF_ACCEL = ACCEL * 0.5;
-const DOUBLE_ACCEL = ACCEL * 3;
-const TRIPLE_ACCEL = ACCEL * 3;
+const ACCEL = MAX_SPEED_X * 0.90
+const HALF_ACCEL = ACCEL * 0.5
+const DOUBLE_ACCEL = ACCEL * 3
+const TRIPLE_ACCEL = ACCEL * 3
 
-const NEG_ACCEL = -ACCEL;
-const NEG_DOUBLE_ACCEL = -DOUBLE_ACCEL;
-const NEG_TRIPLE_ACCEL = -TRIPLE_ACCEL;
+const NEG_ACCEL = -ACCEL
+const NEG_DOUBLE_ACCEL = -DOUBLE_ACCEL
+const NEG_TRIPLE_ACCEL = -TRIPLE_ACCEL
 
-const RAW_JUMP_POWER = 700;
-const JUMP_POWER = -RAW_JUMP_POWER;
+const RAW_JUMP_POWER = 700
+const JUMP_POWER = -RAW_JUMP_POWER
 const BOUNCE_POWER = JUMP_POWER * 1
 const NEG_BOUNCE_POWER = -BOUNCE_POWER
 const DEFAULT_BOUNCE_FRAME = -1
-const BOUNCE_FRAME_SPAN = 5;
+const BOUNCE_FRAME_SPAN = 5
 
-const SPIN_TIMEOUT_MS = 200;
+const SPIN_DURATION_MS = 400
+const SPIN_TIMEOUT_MS = 200
+const SPIN_ANGLE = 360 * 2
 
-const SPIN_ANGLE = 360 * 2;
-
-const EMPTY_LAMBDA = () => { };
+const EMPTY_LAMBDA = () => { }
 
 /* Variables temporales */
 const TEMP = { angle: 0, mustDie: false, landSuccess: false, angularAccel: 0 };
@@ -48,38 +48,48 @@ export default class SwordHero {
      */
     init(x, y) {
         const scene = this.scene
-
         console.log('Loading sword hero!')
-        const hero = scene.physics.add.sprite(x, y, 'sword_hero')
 
-        hero.setBounce(0.2)
+        const heroKey = 'sword_hero'
+        const hero = scene.physics.add.sprite(x, y, heroKey)
+        hero.setScale(2, 2)
+        const w = hero.body.width
+        const h = hero.body.height
+        hero.body.setSize(w * 0.5, h)
+        hero.setBounce(0.0)
         hero.setCollideWorldBounds(false)
 
-        scene.anims.create({
-            key: 'left',
-            frames: scene.anims.generateFrameNumbers('sword_hero', { start: 8, end: 13 }),
-            frameRate: 10,
-            repeat: -1
-        })
+        AssetLoader.loadFor(scene, heroKey, () => {
+            scene.anims.create({
+                key: 'left',
+                frames: scene.anims.generateFrameNumbers(heroKey, { start: 8, end: 13 }),
+                frameRate: 10,
+                repeat: -1
+            })
 
-        scene.anims.create({
-            key: 'turn',
-            frames: [{ key: 'sword_hero', frame: 0 }],
-            frameRate: 20
-        })
+            scene.anims.create({
+                key: 'stand',
+                frames: scene.anims.generateFrameNumbers(heroKey, { start: 0, end: 3 }),
+                frameRate: 5,
+                repeat: -1
+            })
 
-        scene.anims.create({
-            key: 'right',
-            frames: scene.anims.generateFrameNumbers('sword_hero', { start: 8, end: 13 }),
-            frameRate: 10,
-            repeat: -1
+            scene.anims.create({
+                key: 'right',
+                frames: scene.anims.generateFrameNumbers(heroKey, { start: 8, end: 13 }),
+                frameRate: 10,
+                repeat: -1
+            })
+
+            scene.anims.create({
+                key: 'jump',
+                frames: scene.anims.generateFrameNumbers(heroKey, { start: 16, end: 23 }),
+                frameRate: 10,
+                repeat: 0
+            })
         })
 
         this.player = hero
-
-        const w = this.player.body.width
-        const h = this.player.body.height
-        this.player.body.setSize(w * 0.6, h)
 
         /* Seteo la velocidad maxima del sprite en el eje x e y */
         this.player.setMaxVelocity(MAX_SPEED_X, MAX_SPEED_Y)
@@ -122,19 +132,6 @@ export default class SwordHero {
     get anims() { return this.player.anims }
 
     get angle() { return this.player.angle }
-
-    /**
-     * Establece el componente de giro.
-     * @param {Spin} s Spin o giro
-     */
-    set spin(s) { this._spin = s }
-
-    get spin() { return this._spin }
-
-    /**
-     * Retorna true si el jugador esta girando
-     */
-    get spinning() { return this.spin.spinning }
 
     /**
      * Voltea sprite del jugador.
@@ -254,7 +251,7 @@ export default class SwordHero {
      * Marca al jugador como vivo
      */
     resurrect() {
-        this.dead = false;
+        this.dead = false
     }
 
     isDead() {
@@ -271,7 +268,6 @@ export default class SwordHero {
      */
     platformHandler() {
         return (_selfSprite, _platformSprite) => {
-            this.disableSpin()
             this.resetRotation()
         }
     }
@@ -307,8 +303,6 @@ export default class SwordHero {
         } else {
             // en el aire
             this.setAccelerationX(0)
-            this.playAnim('jump')
-
             if (this.checkAttackPress()) { return this.doSpin() }
             if (this.checkLeftPress()) { return this.floatLeft() }
             if (this.checkRightPress()) { return this.floatRight() }
@@ -338,9 +332,6 @@ export default class SwordHero {
     jump() {
         this.setVelocityY(JUMP_POWER)
         this.playAnim('jump', true)
-        this.initialAngularVelocity = this.velocity.x
-        this.setAngularVelocity(this.initialAngularVelocity)
-
         this.scene.time.delayedCall(SPIN_TIMEOUT_MS, this.enableSpin, [], this)
     }
 
@@ -383,7 +374,6 @@ export default class SwordHero {
     /* Ejecuta un rebote desactivando tambien el cuerpo del giro */
     executeBounce() {
         this.bounce()
-        this.spin.disableBody(true, false)
     }
 
     /**
@@ -407,16 +397,13 @@ export default class SwordHero {
     doSpin() {
         if (this.canSpin) {
             this.disableSpin()
-            this.spin.playAnim({
-                completeCb: () => { this.enableSpin() }
-            })
 
             const self = this
             this.scene.tweens.add({
                 targets: self.sprite,
                 angle: self.goingRight() ? self.angle + SPIN_ANGLE : self.angle - SPIN_ANGLE,
                 ease: 'Power1',
-                duration: self.spin.duration
+                duration: SPIN_DURATION_MS
             })
         }
     }
