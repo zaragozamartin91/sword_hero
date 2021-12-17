@@ -1,6 +1,6 @@
-# sAnic\_spin
+# Sword hero
 
-Variante del juego sAnic pero con mecanica de spin mid-air.
+Side scroller en donde la espada se usa como herramienta.
 
 ## Instalar dependencias
 

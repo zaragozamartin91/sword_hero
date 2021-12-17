@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
-import Scene01 from './mz/sanic/Scene01'
-import GlobalConfig from './mz/sanic/GlobalConfig'
+import Scene01 from './mz/swhero/Scene01'
+import GlobalConfig from './mz/swhero/GlobalConfig'
 
 // set to either landscape
 if (!navigator.xr && self.isMobile && screen.orientation && screen.orientation.lock) {

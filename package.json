@@ -1,7 +1,7 @@
 {
   "name": "www",
   "version": "1.0.0",
-  "description": "Sanic main game",
+  "description": "Sword hero main game",
   "main": "index.js",
   "scripts": {
     "compile_watch": "webpack --config webpack.config.base.js --watch --progress",
