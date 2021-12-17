@@ -268,6 +268,7 @@ export default class SwordHero {
      */
     platformHandler() {
         return (_selfSprite, _platformSprite) => {
+            this.disableSpin()
             this.resetRotation()
         }
     }
@@ -303,7 +304,7 @@ export default class SwordHero {
         } else {
             // en el aire
             this.setAccelerationX(0)
-            if (this.checkAttackPress()) { return this.doSpin() }
+            if (this.checkJumpPress()) { return this.tryToSpin() }
             if (this.checkLeftPress()) { return this.floatLeft() }
             if (this.checkRightPress()) { return this.floatRight() }
         }
@@ -384,27 +385,19 @@ export default class SwordHero {
         return tile.properties.deadly
     }
 
-    rotateLeftMidair() {
-        TEMP.angularAccel = Math.abs(this.initialAngularVelocity) * -1
-        return this.setAngularAcceleration(TEMP.angularAccel)
-    }
-
-    rotateRightMidair() {
-        TEMP.angularAccel = Math.abs(this.initialAngularVelocity)
-        return this.setAngularAcceleration(TEMP.angularAccel)
+    tryToSpin() {
+        if (this.canSpin) { this.doSpin() }
     }
 
     doSpin() {
-        if (this.canSpin) {
-            this.disableSpin()
+        this.disableSpin()
 
-            const self = this
-            this.scene.tweens.add({
-                targets: self.sprite,
-                angle: self.goingRight() ? self.angle + SPIN_ANGLE : self.angle - SPIN_ANGLE,
-                ease: 'Power1',
-                duration: SPIN_DURATION_MS
-            })
-        }
+        const self = this
+        this.scene.tweens.add({
+            targets: self.sprite,
+            angle: self.goingRight() ? self.angle + SPIN_ANGLE : self.angle - SPIN_ANGLE,
+            ease: 'Power1',
+            duration: SPIN_DURATION_MS
+        })
     }
 }

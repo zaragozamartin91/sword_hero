@@ -34,4 +34,8 @@ module.exports = {
          WEBGL_RENDERER: JSON.stringify(true),
       }), // config webpack to handle renderer swapping in our app
    ],
+   watchOptions: {
+      ignored: ['**/node_modules', '**/public'],
+      poll: 2000 // poll every 2 seconds
+    },  
 }

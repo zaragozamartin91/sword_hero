@@ -4,6 +4,7 @@
   "description": "Sanic main game",
   "main": "index.js",
   "scripts": {
+    "compile_watch": "webpack --config webpack.config.base.js --watch --progress",
     "compile_dev": "webpack --config webpack.config.base.js",
     "compile_prod": "webpack --config webpack.config.prod.js",
     "browser": "node server.js",

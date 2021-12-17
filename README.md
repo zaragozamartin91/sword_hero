@@ -17,3 +17,6 @@ De esta manera se genera el archivo `public/main.js` que contiene el codigo prod
 
 Correr `npm start` y abrir una ventana del browser en `localhost:8080`.
 
+## Desarrollo
+
+Correr `npm run compile_watch` para iniciar una configuracion de webpack que constantemente monitoree cambios en el codebase y recompile automaticamente.
