@@ -14,6 +14,7 @@ class BaseScene extends Phaser.Scene {
      */
     constructor(sceneName) {
         super(sceneName)
+        window.scene = this
 
         this.leftButton = new ActionButton(this, 'left_btn')
         this.rightButton = new ActionButton(this, 'right_btn')

@@ -12,12 +12,12 @@ import Camera from './Camera'
 
 // const PLAYER_START_POS = { x: 667, y: 2200 }
 const PLAYER_START_POS = { x: 100, y: 3000 }
-const ABYSS_LIMIT = 5000
+const ABYSS_LIMIT = 3500
 const VOID_DEBUG_TEXT = { init: function () { }, setText: function () { } }
 const CAMERA_OFFSET = { y: 150 }
 
 
-class Scene01 extends BaseScene {
+export default class Scene01 extends BaseScene {
     /**
      * Crea una escena de juego
      */
@@ -40,23 +40,14 @@ class Scene01 extends BaseScene {
 
         this.wasps = [
             { pos: { x: 1000, y: 2900 }, enemy: this.newWasp() },
-            {
-                pos: { x: 1900, y: 2800 }, enemy: this.newWasp(),
-                tweencfg: { props: { x: 1735 }, duration: 1000, yoyo: true, repeat: -1, flipX: true }
-            },
-            { pos: { x: 500, y: 2275 }, enemy: this.newWasp() },
         ]
-
 
         this.crabs = [
             {
-                pos: { x: 280, y: 3300 }, enemy: this.newCrab(),
-                tweencfg: { props: { x: 700 }, duration: 3000, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
-            },
-            {
-                pos: { x: 1260, y: 2220 }, enemy: this.newCrab(),
-                tweencfg: { props: { x: 1450 }, duration: 2500, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
-            },
+                pos: { x: 900, y: 3000 }, enemy: this.newCrab(),
+                // x signals END X position
+                tweencfg: { props: { x: 1100 }, duration: 1500, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
+            }
         ]
     }
 
@@ -196,6 +187,7 @@ class Scene01 extends BaseScene {
 
         const camera = new Camera(this)
         camera.init({ playerSprite: this.swordHero.sprite, offsetY: CAMERA_OFFSET.y })
+
     }
 
 
@@ -217,6 +209,3 @@ blockedDown: ${this.swordHero.blockedDown()}
 canSpin: ${this.swordHero.canSpin}`)
     }
 }
-
-
-export default Scene01;

@@ -28,17 +28,26 @@ const SPIN_ANGLE = 360 * 2
 
 const EMPTY_LAMBDA = () => { }
 
-/* Variables temporales */
-const TEMP = { angle: 0, mustDie: false, landSuccess: false, angularAccel: 0 };
+const STAND_ATTACK_INFO = { animKey: 'unsheath_and_attack', duration: 400 }
 
 
 export default class SwordHero {
+    /** @type{Phaser.Scene} */                                      scene = null
+    /** @type{Phaser.Types.Physics.Arcade.SpriteWithDynamicBody} */ player = null
+    /** @type{boolean} Determina si el personaje esta muerto */     dead = false
+    /** @type{function} Funcion a ejecutar al morir */              onDeath = EMPTY_LAMBDA
+    /** @type{boolean} Controla si el personaje puede girar */      canSpin = false
+    /** @type{number} El frame en el que el jugador reboto */       bounceFrame = DEFAULT_BOUNCE_FRAME
+
+    /** @type{boolean} Determina si el personaje esta bloqueado para hacer movimientos */
+    motionBlocked = false
+
     /**
      * Crea un objeto de tipo jugador
      * @param {Phaser.Scene} scene Escena del juego
      */
     constructor(scene) {
-        this.scene = scene;
+        this.scene = scene
     }
 
     /**
@@ -53,9 +62,9 @@ export default class SwordHero {
         const heroKey = 'sword_hero'
         const hero = scene.physics.add.sprite(x, y, heroKey)
         hero.setScale(2, 2)
-        const w = hero.body.width
-        const h = hero.body.height
-        hero.body.setSize(w * 0.5, h)
+        // carefully configuring hitbox correctly...
+        hero.body.setSize(hero.body.width * 0.3, hero.body.height * 0.8)
+        hero.body.setOffset(hero.body.offset.x, 6)
         hero.setBounce(0.0)
         hero.setCollideWorldBounds(false)
 
@@ -87,6 +96,13 @@ export default class SwordHero {
                 frameRate: 10,
                 repeat: 0
             })
+
+            scene.anims.create({
+                key: STAND_ATTACK_INFO.animKey,
+                frames: scene.anims.generateFrameNumbers(heroKey, { start: 47, end: 52 }),
+                duration: 400,
+                repeat: 0
+            })
         })
 
         this.player = hero
@@ -94,21 +110,11 @@ export default class SwordHero {
         /* Seteo la velocidad maxima del sprite en el eje x e y */
         this.player.setMaxVelocity(MAX_SPEED_X, MAX_SPEED_Y)
 
-        /* Determina si el personaje esta muerto */
-        this.dead = false
-        this.onDeath = EMPTY_LAMBDA
-
         /* Manejadores de input desde el mundo exterior */
         this.checkJumpPress = EMPTY_LAMBDA
         this.checkLeftPress = EMPTY_LAMBDA
         this.checkRightPress = EMPTY_LAMBDA
         this.checkAttackPress = EMPTY_LAMBDA
-
-        /* Controla si el personaje puede girar */
-        this.canSpin = false
-
-        /* El frame en el que el jugador reboto */
-        this.bounceFrame = DEFAULT_BOUNCE_FRAME
     }
 
     get sprite() { return this.player }
@@ -284,12 +290,15 @@ export default class SwordHero {
      * Actualiza el estado del jugador a partir de los inputs del mundo real.
      */
     update() {
+        // si tengo movimientos bloqueados => evito todo movimiento
+        if (this.motionBlocked) { return }
+
         if (this.blockedDown()) {
             // en el piso
+            if (this.checkAttackPress()) { return this.standAttack() }
             if (this.checkJumpPress()) { return this.jump() }
             if (this.checkLeftPress()) { return this.walkLeft() }
             if (this.checkRightPress()) { return this.walkRight() }
-
 
             // si no presiono ningun boton y el personaje se esta moviendo lento...
             if (Math.abs(this.velocity.x) < HALF_ACCEL) {
@@ -300,7 +309,7 @@ export default class SwordHero {
             }
 
             this.playAnim(this.goingLeft() ? 'left' : 'right', true)
-            return this.setAccelerationX(this.goingLeft() ? ACCEL : NEG_ACCEL)
+            return this.decelerate()
         } else {
             // en el aire
             this.setAccelerationX(0)
@@ -308,6 +317,10 @@ export default class SwordHero {
             if (this.checkLeftPress()) { return this.floatLeft() }
             if (this.checkRightPress()) { return this.floatRight() }
         }
+    }
+
+    decelerate() {
+        return this.setAccelerationX(this.goingLeft() ? ACCEL : NEG_ACCEL)
     }
 
     walkLeft() {
@@ -334,6 +347,24 @@ export default class SwordHero {
         this.setVelocityY(JUMP_POWER)
         this.playAnim('jump', true)
         this.scene.time.delayedCall(SPIN_TIMEOUT_MS, this.enableSpin, [], this)
+    }
+
+    standAttack() {
+        this.setAccelerationX(0)
+        this.withMotionBlock(() => this.playAnim(STAND_ATTACK_INFO.animKey, true), STAND_ATTACK_INFO.duration)
+    }
+
+    /**
+     * Ejecuta una accion y bloquea movimientos por un tiempo determinado
+     * @param {Function} action Accion a ejecutar
+     * @param {number} blockTime Tiempo de bloqueo en ms
+     */
+    withMotionBlock(action, blockTime) {
+        this.motionBlocked = true
+        action()
+        this.scene.time.delayedCall(blockTime, () => {
+            this.motionBlocked = false
+        }, [], this)
     }
 
     enableSpin() { this.canSpin = true }
