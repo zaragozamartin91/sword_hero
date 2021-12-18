@@ -11,7 +11,7 @@ import SwordHero from './SwordHero'
 import Camera from './Camera'
 
 // const PLAYER_START_POS = { x: 667, y: 2200 }
-const PLAYER_START_POS = { x: 100, y: 3000 }
+const PLAYER_START_POS = { x: 150, y: 1100 }
 const ABYSS_LIMIT = 3500
 const VOID_DEBUG_TEXT = { init: function () { }, setText: function () { } }
 const CAMERA_OFFSET = { y: 150 }
@@ -39,14 +39,14 @@ export default class Scene01 extends BaseScene {
         this.tileset = new Tileset(this)
 
         this.wasps = [
-            { pos: { x: 1000, y: 2900 }, enemy: this.newWasp() },
+            { pos: { x: 1000, y: 950 }, enemy: this.newWasp() },
         ]
 
         this.crabs = [
             {
-                pos: { x: 900, y: 3000 }, enemy: this.newCrab(),
+                pos: { x: 1450, y: 1000 }, enemy: this.newCrab(),
                 // x signals END X position
-                tweencfg: { props: { x: 1100 }, duration: 1500, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
+                tweencfg: { props: { x: 1550 }, duration: 1500, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
             }
         ]
     }
@@ -115,7 +115,7 @@ export default class Scene01 extends BaseScene {
         this.stars = this.physics.add.group({
             key: 'star', //texture key to be the star image by default
             repeat: 6, //Because it creates 1 child automatically, repeating 11 times means we'll get 12 in total
-            setXY: { x: 12, y: PLAYER_START_POS.y, stepX: 70 } //this is used to set the position of the 12 children the Group creates. Each child will be placed starting at x: 12, y: 0 and with an x step of 70
+            setXY: { x: 90, y: PLAYER_START_POS.y, stepX: 70 } //this is used to set the position of the 12 children the Group creates. Each child will be placed starting at x: 12, y: 0 and with an x step of 70
         });
 
         this.stars.children.iterate(child => { child.setBounceY(this.numberBetween(0.4, 0.8)) })
@@ -127,7 +127,7 @@ export default class Scene01 extends BaseScene {
         If that occurs it can then optionally invoke your own callback, but for the sake of just colliding with platforms we don't require that */
 
         // we add collider between sword hero and world layer
-        this.physics.add.collider(this.swordHero.sprite, worldLayer, this.swordHero.platformHandler())
+        this.swordHero.handlePlatforms(worldLayer)
 
         this.physics.add.collider(this.stars, worldLayer)
 
@@ -164,7 +164,9 @@ export default class Scene01 extends BaseScene {
                 this.swordHero.die()
             })
 
-            if (w.tweencfg) this.tweens.add({ ...w.tweencfg, targets: wasp })
+            if (w.tweencfg) { this.tweens.add({ ...w.tweencfg, targets: wasp }) }
+            wasp.setOnDeath(() => this.explosion.explode(wasp.x, wasp.y))
+            this.swordHero.handleAttackingEnemy(wasp.sprite, wasp.die.bind(wasp))
         })
 
         this.crabs.forEach(c => {
@@ -175,7 +177,9 @@ export default class Scene01 extends BaseScene {
                 this.swordHero.die()
             })
 
-            if (c.tweencfg) this.tweens.add({ ...c.tweencfg, targets: crab })
+            if (c.tweencfg) { this.tweens.add({ ...c.tweencfg, targets: crab }) }
+            crab.setOnDeath(() => this.explosion.explode(crab.x, crab.y, 2, 2))
+            this.swordHero.handleAttackingEnemy(crab.sprite, crab.die.bind(crab))
         })
 
         /* Si el jugador toca un objeto de la capa 'death' este muere */
@@ -187,7 +191,6 @@ export default class Scene01 extends BaseScene {
 
         const camera = new Camera(this)
         camera.init({ playerSprite: this.swordHero.sprite, offsetY: CAMERA_OFFSET.y })
-
     }
 
 

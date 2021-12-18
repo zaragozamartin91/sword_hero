@@ -64,9 +64,9 @@ class StaticEnemy {
     /**
      * Reproduce la animacion.
      */
-    playAnim() { 
+    playAnim() {
         this.sprite.anims.play(this.animKey, true)
-        return this 
+        return this
     }
 
     /**
@@ -112,7 +112,14 @@ class StaticEnemy {
 
     die() {
         this.disableBody()
+        this.onDeath()
     }
+
+    /**
+     * Establece funcion a ejecutar en la muerte del enemigo
+     * @param {Function} f funcion a ejecutar cuando el enemigo muere
+     */
+    setOnDeath(f) { this.onDeath = f }
 }
 
 export default StaticEnemy;

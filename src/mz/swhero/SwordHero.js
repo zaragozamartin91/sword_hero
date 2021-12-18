@@ -1,6 +1,7 @@
 // @ts-check
 
 import AssetLoader from './AssetLoader'
+import Hitbox from './Hitbox'
 
 const MAX_SPEED_X = 400
 const MAX_SPEED_Y = 1100
@@ -29,6 +30,7 @@ const SPIN_ANGLE = 360 * 2
 const EMPTY_LAMBDA = () => { }
 
 const STAND_ATTACK_INFO = { animKey: 'unsheath_and_attack', duration: 400 }
+const BODY_SCALING_FACTOR = {w: 0.3, h: 0.8}
 
 
 export default class SwordHero {
@@ -41,6 +43,8 @@ export default class SwordHero {
 
     /** @type{boolean} Determina si el personaje esta bloqueado para hacer movimientos */
     motionBlocked = false
+
+    /** @type{Hitbox} Hitbox de ataques */ standHitbox = null
 
     /**
      * Crea un objeto de tipo jugador
@@ -63,7 +67,7 @@ export default class SwordHero {
         const hero = scene.physics.add.sprite(x, y, heroKey)
         hero.setScale(2, 2)
         // carefully configuring hitbox correctly...
-        hero.body.setSize(hero.body.width * 0.3, hero.body.height * 0.8)
+        hero.body.setSize(hero.body.width * BODY_SCALING_FACTOR.w, hero.body.height * BODY_SCALING_FACTOR.h)
         hero.body.setOffset(hero.body.offset.x, 6)
         hero.setBounce(0.0)
         hero.setCollideWorldBounds(false)
@@ -115,6 +119,9 @@ export default class SwordHero {
         this.checkLeftPress = EMPTY_LAMBDA
         this.checkRightPress = EMPTY_LAMBDA
         this.checkAttackPress = EMPTY_LAMBDA
+
+        /* Inicializacion del hitbox de golpe */
+        this.standHitbox = new Hitbox(scene).init({x:0, y:0, w: 60, h: 20})
     }
 
     get sprite() { return this.player }
@@ -145,6 +152,10 @@ export default class SwordHero {
      * @param {Boolean} value True para voltear sprite.
      */
     set flipX(value) { this.player.flipX = value }
+
+    get facingLeft() { return this.player.flipX }
+
+    get facingRight() { return !this.facingLeft }
 
     /**
      * Establece los manejadores de input (teclado y tactil)
@@ -268,17 +279,26 @@ export default class SwordHero {
         return !this.isDead()
     }
 
+
     /**
-     * Genera un manejador de colision con plataformas.
-     * 
+     * Configura el manejo de plataformas
+     * @param {Phaser.GameObjects.GameObject} platforms Platform group 
      */
-    platformHandler() {
-        return (_selfSprite, _platformSprite) => {
+    handlePlatforms(platforms) {
+        this.scene.physics.add.collider(this.sprite, platforms, () => {
             this.disableSpin()
             this.resetRotation()
-        }
+        })
     }
 
+    /**
+     * Configura manejador de golpe de enemigo
+     * @param {Phaser.GameObjects.GameObject} enemySprite Enemy sprite
+     * @param {function} hitCallback Funcion callback al golpear
+     */
+    handleAttackingEnemy(enemySprite, hitCallback) {
+        this.scene.physics.add.overlap(this.standHitbox.sprite, enemySprite, () => hitCallback())
+    }
 
     /**
      * Establece la funcion a ejecutar cuando el jugador muere.
@@ -303,8 +323,7 @@ export default class SwordHero {
             // si no presiono ningun boton y el personaje se esta moviendo lento...
             if (Math.abs(this.velocity.x) < HALF_ACCEL) {
                 this.playAnim('stand', true)
-                this.setAccelerationX(0)
-                this.setVelocityX(0)
+                this.stopMovement()
                 return
             }
 
@@ -317,6 +336,11 @@ export default class SwordHero {
             if (this.checkLeftPress()) { return this.floatLeft() }
             if (this.checkRightPress()) { return this.floatRight() }
         }
+    }
+
+    stopMovement() {
+        this.setAccelerationX(0)
+        this.setVelocityX(0)
     }
 
     decelerate() {
@@ -351,19 +375,29 @@ export default class SwordHero {
 
     standAttack() {
         this.setAccelerationX(0)
-        this.withMotionBlock(() => this.playAnim(STAND_ATTACK_INFO.animKey, true), STAND_ATTACK_INFO.duration)
+        this.withMotionBlock(() => {
+            this.playAnim(STAND_ATTACK_INFO.animKey, true)
+            const attackOffset = this.facingLeft ? (-this.width) : this.width
+            this.scene.time.delayedCall(STAND_ATTACK_INFO.duration * 0.25, () => {
+                // delay the attack hitbox re-positioning to have animation and hitbox in sync
+                this.standHitbox.enableBody(this.x + attackOffset * BODY_SCALING_FACTOR.w, this.y)
+            }, [], this)
+        }, STAND_ATTACK_INFO.duration
+        , () => this.standHitbox.disableBody())
     }
 
     /**
      * Ejecuta una accion y bloquea movimientos por un tiempo determinado
      * @param {Function} action Accion a ejecutar
      * @param {number} blockTime Tiempo de bloqueo en ms
+     * @param {function} endCallback Funcion a ejecutar al finalizar el 'motion block'
      */
-    withMotionBlock(action, blockTime) {
+    withMotionBlock(action, blockTime, endCallback) {
         this.motionBlocked = true
         action()
         this.scene.time.delayedCall(blockTime, () => {
             this.motionBlocked = false
+            endCallback()
         }, [], this)
     }
 
