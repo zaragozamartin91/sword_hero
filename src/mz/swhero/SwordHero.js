@@ -30,8 +30,36 @@ const SPIN_ANGLE = 360 * 2
 const EMPTY_LAMBDA = () => { }
 
 const STAND_ATTACK_INFO = { animKey: 'unsheath_and_attack', duration: 400 }
-const BODY_SCALING_FACTOR = {w: 0.3, h: 0.8}
+const BODY_SCALING_FACTOR = { w: 0.3, h: 0.8 }
 
+class StandAttackHitbox extends Hitbox {
+    /**
+     * @param {Phaser.Scene} scene Escena del juego
+     * @param {SwordHero} hero Sword hero reference
+     */
+    constructor(scene, hero) {
+        super(scene)
+        this.hero = hero
+        this.init({ x: 0, y: 0, w: 60, h: 20 })
+    }
+
+    attack() {
+        const { x, y } = this.calculatePosition()
+        this.enable(x, y)
+    }
+
+    calculatePosition() {
+        const attackOffset = this.hero.facingLeft ? (-this.hero.width) : this.hero.width
+        return { x: this.hero.x + attackOffset * BODY_SCALING_FACTOR.w, y: this.hero.y }
+    }
+
+    update() {
+        if (this.enabled) {
+            const { x, y } = this.calculatePosition()
+            this.setPosition(x, y)
+        }
+    }
+}
 
 export default class SwordHero {
     /** @type{Phaser.Scene} */                                      scene = null
@@ -44,7 +72,7 @@ export default class SwordHero {
     /** @type{boolean} Determina si el personaje esta bloqueado para hacer movimientos */
     motionBlocked = false
 
-    /** @type{Hitbox} Hitbox de ataques */ standHitbox = null
+    /** @type{StandAttackHitbox} Hitbox de ataques */ standHitbox = null
 
     /**
      * Crea un objeto de tipo jugador
@@ -121,7 +149,7 @@ export default class SwordHero {
         this.checkAttackPress = EMPTY_LAMBDA
 
         /* Inicializacion del hitbox de golpe */
-        this.standHitbox = new Hitbox(scene).init({x:0, y:0, w: 60, h: 20})
+        this.standHitbox = new StandAttackHitbox(scene, this)
     }
 
     get sprite() { return this.player }
@@ -310,6 +338,8 @@ export default class SwordHero {
      * Actualiza el estado del jugador a partir de los inputs del mundo real.
      */
     update() {
+        this.standHitbox.update()
+
         // si tengo movimientos bloqueados => evito todo movimiento
         if (this.motionBlocked) { return }
 
@@ -377,13 +407,12 @@ export default class SwordHero {
         this.setAccelerationX(0)
         this.withMotionBlock(() => {
             this.playAnim(STAND_ATTACK_INFO.animKey, true)
-            const attackOffset = this.facingLeft ? (-this.width) : this.width
             this.scene.time.delayedCall(STAND_ATTACK_INFO.duration * 0.25, () => {
                 // delay the attack hitbox re-positioning to have animation and hitbox in sync
-                this.standHitbox.enableBody(this.x + attackOffset * BODY_SCALING_FACTOR.w, this.y)
+                this.standHitbox.attack()
             }, [], this)
         }, STAND_ATTACK_INFO.duration
-        , () => this.standHitbox.disableBody())
+            , () => this.standHitbox.disable())
     }
 
     /**
