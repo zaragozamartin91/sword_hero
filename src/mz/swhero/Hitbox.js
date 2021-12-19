@@ -1,3 +1,4 @@
+// @ts-check
 
 export default class Hitbox {
     /** @type{boolean} indica si el hitbox esta activo */ enabled = false
@@ -18,6 +19,7 @@ export default class Hitbox {
         const scene = this.scene
         const rectangle = scene.add.rectangle(x, y, w, h, 0xABCDEF, 0)
         this.rectangle = scene.physics.add.existing(rectangle, false)
+        // @ts-ignore
         this.rectangle.body.setAllowGravity(false)
         return this
     }
@@ -53,13 +55,6 @@ export default class Hitbox {
         // por lo cual se lo reestablece en la posicion indicada
         this.setPosition(x, y)
         this.enabled = true
-    }
-
-    update() {
-        this.sprite.x = this.player.x;
-        this.sprite.y = this.player.y;
-        this.body.velocity.x = this.player.body.velocity.x;
-        this.body.velocity.y = this.player.body.velocity.y;
     }
 }
 

@@ -95,11 +95,12 @@ export default class Scene01 extends BaseScene {
 
         // loading sword hero ===================================================================================================
         this.swordHero.init(PLAYER_START_POS.x, PLAYER_START_POS.y)
+        const inManager = this.inputManager
         this.swordHero.setInputManager({
-            checkJumpPress: this.checkJumpPress.bind(this),
-            checkLeftPress: this.checkLeftPress.bind(this),
-            checkRightPress: this.checkRightPress.bind(this),
-            checkAttackPress: this.checkAttackPress.bind(this)
+            checkJumpPress: inManager.checkJumpPress.bind(inManager),
+            checkLeftPress: inManager.checkLeftPress.bind(inManager),
+            checkRightPress: inManager.checkRightPress.bind(inManager),
+            checkAttackPress: inManager.checkAttackPress.bind(inManager)
         })
         this.swordHero.setOnDeath(() => {
             this.explosion.explode(this.swordHero.x, this.swordHero.y)
