@@ -38,6 +38,8 @@ export default class Scene01 extends BaseScene {
 
         this.tileset = new Tileset(this)
 
+        this.mainCamera = new Camera(this)
+
         this.wasps = [
             { pos: { x: 2400, y: 1050 }, enemy: this.newWasp(), 
             tweencfg: { props: { x: 2600 }, duration: 1500, yoyo: true, repeat: -1, flipX: false, hold: 200, repeatDelay: 200 }},
@@ -115,6 +117,7 @@ export default class Scene01 extends BaseScene {
         this.swordHero.setOnDeath(() => {
             this.explosion.explode(this.swordHero.x, this.swordHero.y)
             this.physics.pause()
+            this.mainCamera.fadeOut()
             this.time.delayedCall(1000, () => {
                 this.swordHero.resurrect()
                 this.scene.restart()
@@ -165,7 +168,7 @@ export default class Scene01 extends BaseScene {
         this.physics.add.collider(this.bombs, worldLayer);
 
         this.physics.add.collider(this.swordHero.sprite, this.bombs, (p, _) => {
-            this.swordHero.die();
+            this.swordHero.die()
         });
 
         this.wasps.forEach(w => {
@@ -182,7 +185,8 @@ export default class Scene01 extends BaseScene {
 
         this.crabs.forEach(c => {
             const crab = c.enemy
-            this.physics.add.collider(crab.sprite, worldLayer)
+            // disable gravity on crab enemy upon collision to optimise calculations
+            this.physics.add.collider(crab.sprite, worldLayer, () => crab.sprite.body.setAllowGravity(false))
 
             this.physics.add.collider(this.swordHero.sprite, crab.sprite, (p, _) => {
                 this.swordHero.die()
@@ -201,20 +205,20 @@ export default class Scene01 extends BaseScene {
         /* MANEJO DE CAMARA ----------------------------------------------------------------------------------------------------------- */
 
         // configure camera to follow player sprite
-        this.camera = new Camera(this)
-        this.camera.init({ 
+        this.mainCamera.init({ 
             playerSprite: this.swordHero.sprite, 
             x: this.swordHero.sprite.x , 
             y: CAMERA_POS.y ,
             followHorizontal: true,
             followVertical: false
         })
+        this.mainCamera.fadeIn() // fade in at start of scene
     }
 
 
     update() {
         if (this.swordHero.isAlive()) {
-            this.camera.update()
+            this.mainCamera.update()
             this.swordHero.update()
             this.bg.update(this.swordHero.body.velocity.x, 0) // dont update background in Y axis
         }
