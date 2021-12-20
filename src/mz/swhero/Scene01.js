@@ -228,7 +228,8 @@ export default class Scene01 extends BaseScene {
 
         this.debugText.setText(`X: ${Math.round(this.swordHero.x)} ; Y: ${Math.round(this.swordHero.y)}, 
 p1x: ${Math.round(this.input.pointer1.x)} ; p2x: ${Math.round(this.input.pointer2.x)}
-acx: ${Math.round(this.swordHero.body.acceleration.x)} ; acy: ${Math.round(this.swordHero.body.acceleration.y)}
+acx: ${Math.round(this.swordHero.body.acceleration.x)} ; acy: ${Math.round(this.swordHero.body.acceleration.y)},
+vx: ${Math.round(this.swordHero.velocity.x)} ; vy: ${Math.round(this.swordHero.velocity.y)},
 blockedDown: ${this.swordHero.blockedDown()}
 canSpin: ${this.swordHero.canSpin}`)
     }

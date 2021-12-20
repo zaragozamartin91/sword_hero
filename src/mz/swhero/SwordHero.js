@@ -6,6 +6,7 @@ import InputManager from './InputManager'
 
 const MAX_SPEED_X = 400
 const MAX_SPEED_Y = 1100
+const MAX_DROP_SPEED_Y = 800
 
 /* Aceleracion del jugador mientras camina */
 const ACCEL = MAX_SPEED_X * 0.90
@@ -358,9 +359,6 @@ export default class SwordHero {
     update() {
         this.standHitbox.update()
 
-        // si tengo movimientos bloqueados => evito todo movimiento
-        // if (this.motionBlocked) { return }
-
         TEMP.input = this.inputManager.currentInput
         TEMP.status = this.parseStatus()
 
@@ -399,6 +397,8 @@ export default class SwordHero {
      * @param {{action:string, dir:string}} input User input
      */
     updateFloating(input) {
+        this.capDropSpeed()
+
         // en el aire
         switch (input.action) {
             case 'JUMP': return this.tryToSpin()
@@ -407,6 +407,13 @@ export default class SwordHero {
                 case 'RIGHT': return this.floatRight()
                 default: return this.setAccelerationX(0) // no directions pressed
             }
+        }
+    }
+
+    capDropSpeed() {
+        if (this.velocity.y > MAX_DROP_SPEED_Y) {
+            this.setAccelerationY(0)
+            this.setVelocityY(MAX_DROP_SPEED_Y)
         }
     }
 
