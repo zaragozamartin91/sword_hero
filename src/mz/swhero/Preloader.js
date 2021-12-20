@@ -12,24 +12,15 @@ export default class Preloader {
     init() {
         AssetLoader.loadFor(this.scene, 'IMAGES', () => {
             // load sword hero sprites ; dimensions 350 × 666 ; 7 imgs horizontal & 18 imgs vertical
-            this.scene.load.spritesheet('sword_hero', 'assets/sword_hero.png', { frameWidth: 50, frameHeight: 37 });
+            this.scene.load.spritesheet('sword_hero', 'assets/sword_hero.png', { frameWidth: 50, frameHeight: 37 })
 
             this.scene.load.image('star', 'assets/star.png')
             this.scene.load.image('bomb', 'assets/bomb.png')
-            //this.scene.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 })
 
-            this.scene.load.multiatlas('sonic3', 'assets/sonic3.json', 'assets')
-
-            // this.scene.load.image('background' , 'assets/background.png')
-            // this.scene.load.image('background', 'assets/angel_island_cloud.png') MEH...
             this.scene.load.image('background', 'assets/industrial-background.jpeg') // LOOKS GOOD
-            // this.scene.load.image('background', 'assets/white-metal-panels.jpeg') LOOKS BAD!
-            // this.scene.load.image('background', 'assets/stone-wall.jpeg') // SORTA WORKS...
 
             this.scene.load.multiatlas('sparkle', 'assets/sparkle.json', 'assets')
             this.scene.load.multiatlas('explosion', 'assets/explosion.json', 'assets')
-
-            this.scene.load.image('spin', 'assets/circle.png')
 
             // cargamos la imagen de la avispa
             this.scene.load.multiatlas('wasp', 'assets/wasp.json', 'assets')
@@ -49,6 +40,6 @@ export default class Preloader {
             this.scene.load.image('right_btn', 'assets/buttons/right.png')
             this.scene.load.image('a_btn', 'assets/buttons/a.png')
             this.scene.load.image('b_btn', 'assets/buttons/b.png')
-        });
+        })
     }
 }
