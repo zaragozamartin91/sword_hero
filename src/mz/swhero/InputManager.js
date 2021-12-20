@@ -90,4 +90,25 @@ export default class InputManager {
         console.log('Creating keyboard cursor keys')
         this.cs = this.scene.input.keyboard.createCursorKeys()
     }
+
+    get currentInput() {
+        const currIn = {}
+        if (this.checkRightPress()) {
+            currIn.dir = 'RIGHT'
+        } else if (this.checkLeftPress()) {
+            currIn.dir = 'LEFT'
+        } else {
+            currIn.dir = 'NONE'
+        }
+
+        if (this.checkAttackPress()) {
+            currIn.action = 'ATTACK'
+        } else if (this.checkJumpPress()) {
+            currIn.action = 'JUMP'
+        } else {
+            currIn.action = 'NONE'
+        }
+
+        return currIn
+    }
 }

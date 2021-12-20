@@ -95,13 +95,7 @@ export default class Scene01 extends BaseScene {
 
         // loading sword hero ===================================================================================================
         this.swordHero.init(PLAYER_START_POS.x, PLAYER_START_POS.y)
-        const inManager = this.inputManager
-        this.swordHero.setInputManager({
-            checkJumpPress: inManager.checkJumpPress.bind(inManager),
-            checkLeftPress: inManager.checkLeftPress.bind(inManager),
-            checkRightPress: inManager.checkRightPress.bind(inManager),
-            checkAttackPress: inManager.checkAttackPress.bind(inManager)
-        })
+        this.swordHero.setInputManager(this.inputManager)
         this.swordHero.setOnDeath(() => {
             this.explosion.explode(this.swordHero.x, this.swordHero.y)
             this.physics.pause()
@@ -209,6 +203,7 @@ export default class Scene01 extends BaseScene {
 
         this.debugText.setText(`X: ${Math.round(this.swordHero.x)} ; Y: ${Math.round(this.swordHero.y)}, 
 p1x: ${Math.round(this.input.pointer1.x)} ; p2x: ${Math.round(this.input.pointer2.x)}
+acx: ${Math.round(this.swordHero.body.acceleration.x)} ; acy: ${Math.round(this.swordHero.body.acceleration.y)}
 blockedDown: ${this.swordHero.blockedDown()}
 canSpin: ${this.swordHero.canSpin}`)
     }

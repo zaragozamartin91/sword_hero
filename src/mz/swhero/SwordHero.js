@@ -2,6 +2,7 @@
 
 import AssetLoader from './AssetLoader'
 import Hitbox from './Hitbox'
+import InputManager from './InputManager'
 
 const MAX_SPEED_X = 400
 const MAX_SPEED_Y = 1100
@@ -31,6 +32,12 @@ const EMPTY_LAMBDA = () => { }
 
 const STAND_ATTACK_INFO = { animKey: 'unsheath_and_attack', duration: 400 }
 const BODY_SCALING_FACTOR = { w: 0.3, h: 0.8 }
+
+// variables temporales para ahorrar memoria
+const TEMP = {
+    input: { dir: 'NONE', action: 'NONE' }, // inputManager's input
+    status: { position: 'STANDING', action: 'NONE' } // hero's position & action status
+}
 
 class StandAttackHitbox extends Hitbox {
     /**
@@ -68,11 +75,12 @@ export default class SwordHero {
     /** @type{function} Funcion a ejecutar al morir */              onDeath = EMPTY_LAMBDA
     /** @type{boolean} Controla si el personaje puede girar */      canSpin = false
     /** @type{number} El frame en el que el jugador reboto */       bounceFrame = DEFAULT_BOUNCE_FRAME
+    /** @type{StandAttackHitbox} Hitbox de ataques */               standHitbox = null
+    /** @type{Boolean} Indica si el heroe esta girando */           spinning = false
+    /** @type{Boolean} Indica si el heroe esta atacando */          attacking = false
 
     /** @type{boolean} Determina si el personaje esta bloqueado para hacer movimientos */
     motionBlocked = false
-
-    /** @type{StandAttackHitbox} Hitbox de ataques */ standHitbox = null
 
     /**
      * Crea un objeto de tipo jugador
@@ -142,12 +150,6 @@ export default class SwordHero {
         /* Seteo la velocidad maxima del sprite en el eje x e y */
         this.player.setMaxVelocity(MAX_SPEED_X, MAX_SPEED_Y)
 
-        /* Manejadores de input desde el mundo exterior */
-        this.checkJumpPress = EMPTY_LAMBDA
-        this.checkLeftPress = EMPTY_LAMBDA
-        this.checkRightPress = EMPTY_LAMBDA
-        this.checkAttackPress = EMPTY_LAMBDA
-
         /* Inicializacion del hitbox de golpe */
         this.standHitbox = new StandAttackHitbox(scene, this)
     }
@@ -187,13 +189,10 @@ export default class SwordHero {
 
     /**
      * Establece los manejadores de input (teclado y tactil)
-     * @param {Object} inputHandler Manejador de los inputs del mundo exterior. 
+     * @param {InputManager} inputManager Manejador de los inputs del mundo exterior. 
      */
-    setInputManager({ checkJumpPress, checkLeftPress, checkRightPress, checkAttackPress }) {
-        this.checkJumpPress = checkJumpPress
-        this.checkLeftPress = checkLeftPress
-        this.checkRightPress = checkRightPress
-        this.checkAttackPress = checkAttackPress
+    setInputManager(inputManager) {
+        this.inputManager = inputManager
     }
 
     /**
@@ -334,6 +333,25 @@ export default class SwordHero {
      */
     setOnDeath(f) { this.onDeath = f }
 
+    parseStatus() {
+        const heroStatus = {}
+        if (this.blockedDown()) {
+            heroStatus.position = 'STANDING'
+        } else {
+            heroStatus.position = 'FLOATING'
+        }
+
+        if (this.attacking) {
+            heroStatus.action = 'ATTACKING'
+        } else if (this.spinning) {
+            heroStatus.action = 'SPINNING'
+        } else {
+            heroStatus.action = 'NONE'
+        }
+
+        return heroStatus
+    }
+
     /**
      * Actualiza el estado del jugador a partir de los inputs del mundo real.
      */
@@ -341,31 +359,59 @@ export default class SwordHero {
         this.standHitbox.update()
 
         // si tengo movimientos bloqueados => evito todo movimiento
-        if (this.motionBlocked) { return }
+        // if (this.motionBlocked) { return }
 
-        if (this.blockedDown()) {
-            // en el piso
-            if (this.checkAttackPress()) { return this.standAttack() }
-            if (this.checkJumpPress()) { return this.jump() }
-            if (this.checkLeftPress()) { return this.walkLeft() }
-            if (this.checkRightPress()) { return this.walkRight() }
+        TEMP.input = this.inputManager.currentInput
+        TEMP.status = this.parseStatus()
 
-            // si no presiono ningun boton y el personaje se esta moviendo lento...
-            if (Math.abs(this.velocity.x) < HALF_ACCEL) {
-                this.playAnim('stand', true)
-                this.stopMovement()
-                return
+        switch (TEMP.status.action) {
+            case 'ATTACKING':
+                return this.isStopping() ? this.stopMovement() : this.decelerate()
+            default: switch (TEMP.status.position) {
+                case 'STANDING': return this.updateStading(TEMP.input)
+                case 'FLOATING': return this.updateFloating(TEMP.input)
+                default: // nothing
             }
-
-            this.playAnim(this.goingLeft() ? 'left' : 'right', true)
-            return this.decelerate()
-        } else {
-            // en el aire
-            this.setAccelerationX(0)
-            if (this.checkJumpPress()) { return this.tryToSpin() }
-            if (this.checkLeftPress()) { return this.floatLeft() }
-            if (this.checkRightPress()) { return this.floatRight() }
         }
+    }
+
+    /**
+     * Updates sword hero while standing
+     * @param {{action:string, dir:string}} input User input
+     */
+    updateStading(input) {
+        // en el piso
+        switch (input.action) {
+            case 'ATTACK': return this.standAttack()
+            case 'JUMP': return this.jump()
+            default: // no action button pressed 
+                switch (input.dir) {
+                    case 'LEFT': return this.walkLeft()
+                    case 'RIGHT': return this.walkRight()
+                    default: // no direction button pressed
+                        return this.isStopping() ? this.haltAndStand() : this.walkSlower()
+                }
+        }
+    }
+
+    /**
+     * Updates the sword hero while floating
+     * @param {{action:string, dir:string}} input User input
+     */
+    updateFloating(input) {
+        // en el aire
+        switch (input.action) {
+            case 'JUMP': return this.tryToSpin()
+            default: switch (input.dir) {
+                case 'LEFT': return this.floatLeft()
+                case 'RIGHT': return this.floatRight()
+                default: return this.setAccelerationX(0) // no directions pressed
+            }
+        }
+    }
+
+    isStopping() {
+        return Math.abs(this.velocity.x) < HALF_ACCEL
     }
 
     stopMovement() {
@@ -377,10 +423,15 @@ export default class SwordHero {
         return this.setAccelerationX(this.goingLeft() ? ACCEL : NEG_ACCEL)
     }
 
+    haltAndStand() {
+        this.playAnim('stand', true)
+        return this.stopMovement()
+    }
+
     walkLeft() {
         this.moveLeft()
         this.flipX = true
-        this.playAnim('left', true)
+        return this.playAnim('left', true)
     }
 
     moveLeft() { this.setAccelerationX(this.goingRight() ? NEG_TRIPLE_ACCEL : NEG_ACCEL) }
@@ -395,6 +446,12 @@ export default class SwordHero {
 
     moveRight() { this.setAccelerationX(this.goingLeft() ? TRIPLE_ACCEL : ACCEL) }
 
+    walkSlower() {
+        console.log('WALKING SLOWER')
+        this.playAnim(this.goingLeft() ? 'left' : 'right', true)
+        return this.decelerate()
+    }
+
     floatRight() { this.setAccelerationX(ACCEL) }
 
     jump() {
@@ -404,6 +461,7 @@ export default class SwordHero {
     }
 
     standAttack() {
+        this.attacking = true
         this.setAccelerationX(0)
         this.withMotionBlock(() => {
             this.playAnim(STAND_ATTACK_INFO.animKey, true)
@@ -412,7 +470,10 @@ export default class SwordHero {
                 this.standHitbox.attack()
             }, [], this)
         }, STAND_ATTACK_INFO.duration
-            , () => this.standHitbox.disable())
+            , () => {
+                this.standHitbox.disable()
+                this.attacking = false
+            })
     }
 
     /**
@@ -421,7 +482,7 @@ export default class SwordHero {
      * @param {number} blockTime Tiempo de bloqueo en ms
      * @param {function} endCallback Funcion a ejecutar al finalizar el 'motion block'
      */
-    withMotionBlock(action, blockTime, endCallback) {
+    withMotionBlock(action, blockTime, endCallback = EMPTY_LAMBDA) {
         this.motionBlocked = true
         action()
         this.scene.time.delayedCall(blockTime, () => {
@@ -484,6 +545,7 @@ export default class SwordHero {
     }
 
     doSpin() {
+        this.spinning = true
         this.disableSpin()
 
         const self = this
@@ -491,7 +553,8 @@ export default class SwordHero {
             targets: self.sprite,
             angle: self.goingRight() ? self.angle + SPIN_ANGLE : self.angle - SPIN_ANGLE,
             ease: 'Power1',
-            duration: SPIN_DURATION_MS
+            duration: SPIN_DURATION_MS,
+            onComplete: () => { self.spinning = false }
         })
     }
 }
