@@ -39,14 +39,30 @@ export default class Scene01 extends BaseScene {
         this.tileset = new Tileset(this)
 
         this.wasps = [
-            { pos: { x: 1000, y: 950 }, enemy: this.newWasp() },
+            { pos: { x: 2400, y: 1050 }, enemy: this.newWasp(), 
+            tweencfg: { props: { x: 2600 }, duration: 1500, yoyo: true, repeat: -1, flipX: false, hold: 200, repeatDelay: 200 }},
         ]
 
         this.crabs = [
             {
                 pos: { x: 1450, y: 1000 }, enemy: this.newCrab(),
                 // x signals END X position
-                tweencfg: { props: { x: 1550 }, duration: 1500, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
+                tweencfg: { props: { x: 1700 }, duration: 1500, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
+            },
+            {
+                pos: { x: 2700, y: 1300 }, enemy: this.newCrab(),
+                // x signals END X position
+                tweencfg: { props: { x: 3200 }, duration: 1500, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
+            },
+            {
+                pos: { x: 3600, y: 1200 }, enemy: this.newCrab(),
+                // x signals END X position
+                tweencfg: { props: { x: 3750 }, duration: 1000, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
+            },
+            {
+                pos: { x: 3950, y: 1200 }, enemy: this.newCrab(),
+                // x signals END X position
+                tweencfg: { props: { x: 4200 }, duration: 1000, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
             }
         ]
     }
@@ -160,7 +176,7 @@ export default class Scene01 extends BaseScene {
             })
 
             if (w.tweencfg) { this.tweens.add({ ...w.tweencfg, targets: wasp }) }
-            wasp.setOnDeath(() => this.explosion.explode(wasp.x, wasp.y))
+            wasp.setOnDeath(() => this.explosion.explode(wasp.x, wasp.y, 3, 3))
             this.swordHero.handleAttackingEnemy(wasp.sprite, wasp.die.bind(wasp))
         })
 
@@ -173,7 +189,7 @@ export default class Scene01 extends BaseScene {
             })
 
             if (c.tweencfg) { this.tweens.add({ ...c.tweencfg, targets: crab }) }
-            crab.setOnDeath(() => this.explosion.explode(crab.x, crab.y, 2, 2))
+            crab.setOnDeath(() => this.explosion.explode(crab.x, crab.y, 3, 3))
             this.swordHero.handleAttackingEnemy(crab.sprite, crab.die.bind(crab))
         })
 
