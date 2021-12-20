@@ -447,7 +447,6 @@ export default class SwordHero {
     moveRight() { this.setAccelerationX(this.goingLeft() ? TRIPLE_ACCEL : ACCEL) }
 
     walkSlower() {
-        console.log('WALKING SLOWER')
         this.playAnim(this.goingLeft() ? 'left' : 'right', true)
         return this.decelerate()
     }

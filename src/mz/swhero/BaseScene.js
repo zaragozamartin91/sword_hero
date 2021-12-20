@@ -37,6 +37,10 @@ export default class BaseScene extends Phaser.Scene {
         return { worldWidth, worldHeight, half_worldWidth, half_worldHeight }
     }
 
+    get worldDims() {
+        return BaseScene.getWorldDimensions()
+    }
+
     preload() { throw new Error('Not implemented') }
 
     create() {

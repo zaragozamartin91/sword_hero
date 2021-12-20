@@ -12,9 +12,9 @@ import Camera from './Camera'
 
 // const PLAYER_START_POS = { x: 667, y: 2200 }
 const PLAYER_START_POS = { x: 150, y: 1100 }
-const ABYSS_LIMIT = 3500
+const ABYSS_LIMIT = 1800
 const VOID_DEBUG_TEXT = { init: function () { }, setText: function () { } }
-const CAMERA_OFFSET = { y: 150 }
+const CAMERA_POS = { y: 1250 }
 
 
 export default class Scene01 extends BaseScene {
@@ -184,15 +184,23 @@ export default class Scene01 extends BaseScene {
 
         /* MANEJO DE CAMARA ----------------------------------------------------------------------------------------------------------- */
 
-        const camera = new Camera(this)
-        camera.init({ playerSprite: this.swordHero.sprite, offsetY: CAMERA_OFFSET.y })
+        // configure camera to follow player sprite
+        this.camera = new Camera(this)
+        this.camera.init({ 
+            playerSprite: this.swordHero.sprite, 
+            x: this.swordHero.sprite.x , 
+            y: CAMERA_POS.y ,
+            followHorizontal: true,
+            followVertical: false
+        })
     }
 
 
     update() {
         if (this.swordHero.isAlive()) {
+            this.camera.update()
             this.swordHero.update()
-            this.bg.update(this.swordHero.body.velocity.x, this.swordHero.body.velocity.y)
+            this.bg.update(this.swordHero.body.velocity.x, 0) // dont update background in Y axis
         }
 
         /* Si el jugador se cae al fondo, entonces muere y reiniciamos el juego */
@@ -200,6 +208,7 @@ export default class Scene01 extends BaseScene {
             this.swordHero.setPosition(0, ABYSS_LIMIT - 100)
             this.swordHero.die()
         }
+
 
         this.debugText.setText(`X: ${Math.round(this.swordHero.x)} ; Y: ${Math.round(this.swordHero.y)}, 
 p1x: ${Math.round(this.input.pointer1.x)} ; p2x: ${Math.round(this.input.pointer2.x)}
