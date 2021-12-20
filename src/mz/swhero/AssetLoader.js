@@ -1,13 +1,17 @@
 //@ts-check
 
+/**
+ * Keeps track of loaded game assets.
+ * Avoid duplicate loading of game assets
+ */
 export default class AssetLoader {
     static allAssets = {}
 
     /**
-     * Intenta cargar assets para una escena (en caso que no hayan sido cargados previamente.)
-     * @param {Phaser.Scene} scene Objeto Phaser.Scene.
-     * @param {String} itemName Clave de assets (ej: 'player')
-     * @param {Function} loaderFunction Lambda encargada de cargar los assets.
+     * Tries to load assets for a game scene (ignores request in case assets were loaded previously)
+     * @param {Phaser.Scene} scene Game scene to load assets for.
+     * @param {String} itemName Asset key
+     * @param {Function} loaderFunction loader function to delegate to in order to load assets
      */
     static loadFor(scene, itemName, loaderFunction) {
         const sceneKey = scene.scene.key

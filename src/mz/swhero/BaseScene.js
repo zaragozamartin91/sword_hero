@@ -3,6 +3,7 @@
 import Phaser from 'phaser'
 import InputManager from './InputManager'
 import StaticEnemy from './StaticEnemy'
+import AssetLoader from './AssetLoader'
 
 
 const WORLD_DIMS = { worldWidth: 0, worldHeight: 0, half_worldWidth: 0, half_worldHeight: 0 }
@@ -41,7 +42,40 @@ export default class BaseScene extends Phaser.Scene {
         return BaseScene.getWorldDimensions()
     }
 
-    preload() { throw new Error('Not implemented') }
+    preload() {
+        // loading common game assets
+        AssetLoader.loadFor(this, 'IMAGES', () => {
+            // load sword hero sprites ; dimensions 350 × 666 ; 7 imgs horizontal & 18 imgs vertical
+            this.load.spritesheet('sword_hero', 'assets/sword_hero.png', { frameWidth: 50, frameHeight: 37 })
+
+            this.load.image('star', 'assets/star.png')
+            this.load.image('bomb', 'assets/bomb.png')
+
+            this.load.image('background', 'assets/industrial-background.jpeg') // LOOKS GOOD
+
+            this.load.multiatlas('sparkle', 'assets/sparkle.json', 'assets')
+            this.load.multiatlas('explosion', 'assets/explosion.json', 'assets')
+
+            // cargamos la imagen de la avispa
+            this.load.multiatlas('wasp', 'assets/wasp.json', 'assets')
+
+            // cargamos la imagen de la avispa
+            this.load.multiatlas('crab_walk', 'assets/crab_walk.json', 'assets')
+
+            // cargamos los tiles del map
+            this.load.image('main_map', 'assets/main_map_tiles.png')
+            this.load.tilemapTiledJSON('main_map', 'assets/main_map.json')
+
+            this.load.image('factory_map', 'assets/factory_tiles.png')
+            this.load.tilemapTiledJSON('factory_map', 'assets/factory_map.json')
+
+            // cargamos las imagenes de los botones
+            this.load.image('left_btn', 'assets/buttons/left.png')
+            this.load.image('right_btn', 'assets/buttons/right.png')
+            this.load.image('a_btn', 'assets/buttons/a.png')
+            this.load.image('b_btn', 'assets/buttons/b.png')
+        })
+    }
 
     create() {
         const { worldWidth, worldHeight } = BaseScene.getWorldDimensions()
@@ -68,5 +102,9 @@ export default class BaseScene extends Phaser.Scene {
     /** Crea una nueva instancia de StaticEnemy para un cangrejo */
     newCrab() {
         return new StaticEnemy(this, { key: 'crab_walk', prefix: 'crab_', suffix: '.png', start: 8, end: 18, animDurationMs: 2000, scale: 0.5 })
+    }
+
+    startAnotherScene(sceneKey) {
+        this.scene.start(sceneKey)
     }
 }

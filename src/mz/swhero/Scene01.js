@@ -1,6 +1,5 @@
 // @ts-check
 
-import Preloader from './Preloader'
 import Background from './Background'
 import GameText from './GameText'
 import Explosion from './Explosion'
@@ -23,8 +22,6 @@ export default class Scene01 extends BaseScene {
      */
     constructor() {
         super('Scene01')
-
-        this.preloader = new Preloader(this)
 
         this.swordHero = new SwordHero(this) // new sword hero object
         window.swordHero = this.swordHero
@@ -72,7 +69,7 @@ export default class Scene01 extends BaseScene {
 
     preload() {
         console.log("PRELOAD")
-        this.preloader.init()
+        super.preload()
     }
 
     create() {
