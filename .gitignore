@@ -1,0 +1,12 @@
+node_modules/
+package-lock.json
+
+platforms/
+plugins/
+
+public/js/main.js.LICENSE*
+
+poc_stuff
+
+report.*.json
+**/.DS_Store
