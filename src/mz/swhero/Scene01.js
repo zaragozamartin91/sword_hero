@@ -40,6 +40,9 @@ export default class Scene01 extends BaseScene {
         this.wasps = [
             { pos: { x: 2400, y: 1050 }, enemy: this.newWasp(), 
             tweencfg: { props: { x: 2600 }, duration: 1500, yoyo: true, repeat: -1, flipX: false, hold: 200, repeatDelay: 200 }},
+
+            { pos: { x: 4900, y: 1180 }, enemy: this.newWasp(), 
+            tweencfg: { props: { x: 5350 }, duration: 1500, yoyo: true, repeat: -1, flipX: false, hold: 200, repeatDelay: 200 }},
         ]
 
         this.crabs = [
