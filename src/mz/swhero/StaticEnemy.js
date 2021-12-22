@@ -120,6 +120,23 @@ class StaticEnemy {
      * @param {Function} f funcion a ejecutar cuando el enemigo muere
      */
     setOnDeath(f) { this.onDeath = f }
+
+
+    /** 
+     * Crea una nueva instancia de StaticEnemy para una avispa 
+     * @param{Phaser.Scene} scene Escena del juego
+     * */
+    static newWasp(scene) {
+        return new StaticEnemy(scene, { key: 'wasp', prefix: 'wasp_', suffix: '.png', start: 1, end: 37, animDurationMs: 2000 })
+    }
+
+    /** 
+     * Crea una nueva instancia de StaticEnemy para un cangrejo 
+     * @param{Phaser.Scene} scene Escena del juego
+     * */
+    static newCrab(scene) {
+        return new StaticEnemy(scene, { key: 'crab_walk', prefix: 'crab_', suffix: '.png', start: 8, end: 18, animDurationMs: 2000, scale: 0.5 })
+    }
 }
 
 export default StaticEnemy;

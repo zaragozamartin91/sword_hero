@@ -8,6 +8,7 @@ import Tileset from './Tileset'
 import GlobalConfig from './GlobalConfig'
 import SwordHero from './SwordHero'
 import Camera from './Camera'
+import StaticEnemy from './StaticEnemy'
 
 // const PLAYER_START_POS = { x: 667, y: 2200 }
 const PLAYER_START_POS = { x: 150, y: 1100 }
@@ -38,31 +39,31 @@ export default class Scene01 extends BaseScene {
         this.mainCamera = new Camera(this)
 
         this.wasps = [
-            { pos: { x: 2400, y: 1050 }, enemy: this.newWasp(), 
+            { pos: { x: 2400, y: 1050 }, enemy: StaticEnemy.newWasp(this), 
             tweencfg: { props: { x: 2600 }, duration: 1500, yoyo: true, repeat: -1, flipX: false, hold: 200, repeatDelay: 200 }},
 
-            { pos: { x: 4900, y: 1180 }, enemy: this.newWasp(), 
+            { pos: { x: 4900, y: 1180 }, enemy: StaticEnemy.newWasp(this), 
             tweencfg: { props: { x: 5350 }, duration: 1500, yoyo: true, repeat: -1, flipX: false, hold: 200, repeatDelay: 200 }},
         ]
 
         this.crabs = [
             {
-                pos: { x: 1450, y: 1000 }, enemy: this.newCrab(),
+                pos: { x: 1450, y: 1000 }, enemy: StaticEnemy.newCrab(this),
                 // x signals END X position
                 tweencfg: { props: { x: 1700 }, duration: 1500, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
             },
             {
-                pos: { x: 2700, y: 1300 }, enemy: this.newCrab(),
+                pos: { x: 2700, y: 1300 }, enemy: StaticEnemy.newCrab(this),
                 // x signals END X position
                 tweencfg: { props: { x: 3200 }, duration: 1500, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
             },
             {
-                pos: { x: 3600, y: 1200 }, enemy: this.newCrab(),
+                pos: { x: 3600, y: 1200 }, enemy: StaticEnemy.newCrab(this),
                 // x signals END X position
                 tweencfg: { props: { x: 3750 }, duration: 1000, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
             },
             {
-                pos: { x: 3950, y: 1200 }, enemy: this.newCrab(),
+                pos: { x: 3950, y: 1200 }, enemy: StaticEnemy.newCrab(this),
                 // x signals END X position
                 tweencfg: { props: { x: 4200 }, duration: 1000, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
             }
@@ -213,6 +214,9 @@ export default class Scene01 extends BaseScene {
             followVertical: false
         })
         this.mainCamera.fadeIn() // fade in at start of scene
+
+        // resetting score
+        this.score = 0
     }
 
 

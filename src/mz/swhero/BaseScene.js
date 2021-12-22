@@ -2,7 +2,6 @@
 
 import Phaser from 'phaser'
 import InputManager from './InputManager'
-import StaticEnemy from './StaticEnemy'
 import AssetLoader from './AssetLoader'
 
 
@@ -51,8 +50,6 @@ export default class BaseScene extends Phaser.Scene {
             this.load.image('star', 'assets/star.png')
             this.load.image('bomb', 'assets/bomb.png')
 
-            this.load.image('background', 'assets/industrial-background.jpeg') // LOOKS GOOD
-
             this.load.multiatlas('sparkle', 'assets/sparkle.json', 'assets')
             this.load.multiatlas('explosion', 'assets/explosion.json', 'assets')
 
@@ -66,6 +63,7 @@ export default class BaseScene extends Phaser.Scene {
             this.load.image('main_map', 'assets/main_map_tiles.png')
             this.load.tilemapTiledJSON('main_map', 'assets/main_map.json')
 
+            this.load.image('background', 'assets/industrial-background.jpeg') // LOOKS GOOD
             this.load.image('factory_map', 'assets/factory_tiles.png')
             this.load.tilemapTiledJSON('factory_map', 'assets/factory_map.json')
 
@@ -94,16 +92,10 @@ export default class BaseScene extends Phaser.Scene {
         return (Math.random() * (upBound - lowBound) + lowBound)
     }
 
-    /* Crea una nueva instancia de StaticEnemy para una avispa */
-    newWasp() {
-        return new StaticEnemy(this, { key: 'wasp', prefix: 'wasp_', suffix: '.png', start: 1, end: 37, animDurationMs: 2000 })
-    }
-
-    /** Crea una nueva instancia de StaticEnemy para un cangrejo */
-    newCrab() {
-        return new StaticEnemy(this, { key: 'crab_walk', prefix: 'crab_', suffix: '.png', start: 8, end: 18, animDurationMs: 2000, scale: 0.5 })
-    }
-
+    /**
+     * Shuts down current scene and starts next scene
+     * @param {string} sceneKey Scene id
+     */
     startAnotherScene(sceneKey) {
         this.scene.start(sceneKey)
     }

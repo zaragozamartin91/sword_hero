@@ -11,11 +11,9 @@ const MAX_DROP_SPEED_Y = 800
 /* Aceleracion del jugador mientras camina */
 const ACCEL = MAX_SPEED_X * 0.90
 const HALF_ACCEL = ACCEL * 0.5
-const DOUBLE_ACCEL = ACCEL * 3
 const TRIPLE_ACCEL = ACCEL * 3
 
 const NEG_ACCEL = -ACCEL
-const NEG_DOUBLE_ACCEL = -DOUBLE_ACCEL
 const NEG_TRIPLE_ACCEL = -TRIPLE_ACCEL
 
 const RAW_JUMP_POWER = 700
@@ -71,7 +69,7 @@ class StandAttackHitbox extends Hitbox {
 
 export default class SwordHero {
     /** @type{Phaser.Scene} */                                      scene = null
-    /** @type{Phaser.Types.Physics.Arcade.SpriteWithDynamicBody} */ player = null
+    /** @type{Phaser.Types.Physics.Arcade.SpriteWithDynamicBody} */ sprite = null
     /** @type{boolean} Determina si el personaje esta muerto */     dead = false
     /** @type{function} Funcion a ejecutar al morir */              onDeath = EMPTY_LAMBDA
     /** @type{boolean} Controla si el personaje puede girar */      canSpin = false
@@ -101,13 +99,13 @@ export default class SwordHero {
         console.log('Loading sword hero!')
 
         const heroKey = 'sword_hero'
-        const hero = scene.physics.add.sprite(x, y, heroKey)
-        hero.setScale(2, 2)
+        const sprite = scene.physics.add.sprite(x, y, heroKey)
+        sprite.setScale(2, 2)
         // carefully configuring hitbox correctly...
-        hero.body.setSize(hero.body.width * BODY_SCALING_FACTOR.w, hero.body.height * BODY_SCALING_FACTOR.h)
-        hero.body.setOffset(hero.body.offset.x, 6)
-        hero.setBounce(0.0)
-        hero.setCollideWorldBounds(false)
+        sprite.body.setSize(sprite.body.width * BODY_SCALING_FACTOR.w, sprite.body.height * BODY_SCALING_FACTOR.h)
+        sprite.body.setOffset(sprite.body.offset.x, 6)
+        sprite.setBounce(0.0)
+        sprite.setCollideWorldBounds(false)
 
         AssetLoader.loadFor(scene, heroKey, () => {
             scene.anims.create({
@@ -146,45 +144,43 @@ export default class SwordHero {
             })
         })
 
-        this.player = hero
+        this.sprite = sprite
 
         /* Seteo la velocidad maxima del sprite en el eje x e y */
-        this.player.setMaxVelocity(MAX_SPEED_X, MAX_SPEED_Y)
+        this.sprite.setMaxVelocity(MAX_SPEED_X, MAX_SPEED_Y)
 
         /* Inicializacion del hitbox de golpe */
         this.standHitbox = new StandAttackHitbox(scene, this)
     }
 
-    get sprite() { return this.player }
+    get body() { return this.sprite.body }
 
-    get body() { return this.player.body }
-
-    get velocity() { return this.player.body.velocity }
+    get velocity() { return this.sprite.body.velocity }
 
     get angularVelocity() { return this.body.angularVelocity }
 
     get angularAcceleration() { return this.body.angularAcceleration }
 
-    get x() { return this.player.x }
+    get x() { return this.sprite.x }
 
-    get y() { return this.player.y }
+    get y() { return this.sprite.y }
 
-    get width() { return this.player.width }
+    get width() { return this.sprite.width }
 
-    get height() { return this.player.height }
+    get height() { return this.sprite.height }
 
-    get anims() { return this.player.anims }
+    get anims() { return this.sprite.anims }
 
-    get angle() { return this.player.angle }
+    get angle() { return this.sprite.angle }
 
     /**
      * Voltea sprite del jugador.
      * 
      * @param {Boolean} value True para voltear sprite.
      */
-    set flipX(value) { this.player.flipX = value }
+    set flipX(value) { this.sprite.flipX = value }
 
-    get facingLeft() { return this.player.flipX }
+    get facingLeft() { return this.sprite.flipX }
 
     get facingRight() { return !this.facingLeft }
 
@@ -200,13 +196,13 @@ export default class SwordHero {
      * Establece el rebote del jugador
      * @param {Number} value Valor de rebote.
      */
-    setBounce(value) { this.player.setBounce(value) }
+    setBounce(value) { this.sprite.setBounce(value) }
 
     /**
      * Determina si el sprite del jugador debe rebotar contra los limites del mundo o no.
      * @param {Boolean} value True para que el sprite del jugador rebote.
      */
-    setCollideWorldBounds(value) { this.player.setCollideWorldBounds(value) }
+    setCollideWorldBounds(value) { this.sprite.setCollideWorldBounds(value) }
 
     /**
      * Establece la posicion.
@@ -243,24 +239,24 @@ export default class SwordHero {
      * Rota el sprite del jugador
      * @param {Number} degrees Grados horarios de rotacion.
      */
-    rotate(degrees) { this.player.angle = this.player.angle + degrees }
+    rotate(degrees) { this.sprite.angle = this.sprite.angle + degrees }
 
     /**
      * Establece la velocidad angular del cuerpo.
      * 
      * @param {Number} value Velocidad angular.
      */
-    setAngularVelocity(value) { this.player.setAngularVelocity(value) }
+    setAngularVelocity(value) { this.sprite.setAngularVelocity(value) }
 
     /**
      * Establece la aceleracion angular del cuerpo.
      * 
      * @param {Number} value Aceleracion angular.
      */
-    setAngularAcceleration(value) { this.player.setAngularAcceleration(value) }
+    setAngularAcceleration(value) { this.sprite.setAngularAcceleration(value) }
 
     resetRotation() {
-        this.player.angle = 0
+        this.sprite.angle = 0
         this.setAngularVelocity(0)
     }
 
