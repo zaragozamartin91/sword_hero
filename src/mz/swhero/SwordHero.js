@@ -30,6 +30,7 @@ const SPIN_ANGLE = 360 * 2
 const EMPTY_LAMBDA = () => { }
 
 const STAND_ATTACK_INFO = { animKey: 'unsheath_and_attack', duration: 400 }
+const TAKE_DAMAGE_INFO = { animKey: 'take_damage', duration: 300, speedX: 250, speedY: 300 }
 const BODY_SCALING_FACTOR = { w: 0.3, h: 0.8 }
 
 // variables temporales para ahorrar memoria
@@ -77,6 +78,10 @@ export default class SwordHero {
     /** @type{StandAttackHitbox} Hitbox de ataques */               standHitbox = null
     /** @type{Boolean} Indica si el heroe esta girando */           spinning = false
     /** @type{Boolean} Indica si el heroe esta atacando */          attacking = false
+    /** @type{number} Hero's max health */                          health = 3
+    /** @type{number} Hero's current damage */                      damage = 0
+    /** @type{boolean} Hero is currently taking damage */           takingDamage = false
+    /** @type{function} Take damage callback */                     onTakeDamage = EMPTY_LAMBDA
 
     /** @type{boolean} Determina si el personaje esta bloqueado para hacer movimientos */
     motionBlocked = false
@@ -90,13 +95,16 @@ export default class SwordHero {
     }
 
     /**
-     * Inicializa el jugador en una posicion.
-     * @param {Number} x Posicion x.
-     * @param {Number} y Posicion y.
+     * Initializes sword hero.
+     * @param {Number} x X position.
+     * @param {Number} y Y position.
+     * @param {{health: Number}} extras Extra parameters like health and stuff
      */
-    init(x, y) {
+    init(x, y, extras = { health: 3 }) {
         const scene = this.scene
         console.log('Loading sword hero!')
+
+        this.damage = 0
 
         const heroKey = 'sword_hero'
         const sprite = scene.physics.add.sprite(x, y, heroKey)
@@ -139,7 +147,14 @@ export default class SwordHero {
             scene.anims.create({
                 key: STAND_ATTACK_INFO.animKey,
                 frames: scene.anims.generateFrameNumbers(heroKey, { start: 47, end: 52 }),
-                duration: 400,
+                duration: STAND_ATTACK_INFO.duration,
+                repeat: 0
+            })
+
+            scene.anims.create({
+                key: TAKE_DAMAGE_INFO.animKey,
+                frames: scene.anims.generateFrameNumbers(heroKey, { frames: [123, 122, 121] }),
+                duration: TAKE_DAMAGE_INFO.duration,
                 repeat: 0
             })
         })
@@ -183,6 +198,8 @@ export default class SwordHero {
     get facingLeft() { return this.sprite.flipX }
 
     get facingRight() { return !this.facingLeft }
+
+    get remainingHealth() { return this.health - this.damage }
 
     /**
      * Establece los manejadores de input (teclado y tactil)
@@ -332,7 +349,9 @@ export default class SwordHero {
 
     parseStatus() {
         const heroStatus = {}
-        if (this.blockedDown()) {
+        if (this.takingDamage) {
+            heroStatus.position = 'TAKING_DAMAGE'
+        } else if (this.blockedDown()) {
             heroStatus.position = 'STANDING'
         } else {
             heroStatus.position = 'FLOATING'
@@ -359,6 +378,7 @@ export default class SwordHero {
         TEMP.status = this.parseStatus()
 
         switch (TEMP.status.position) {
+            case 'TAKING_DAMAGE': return // movement is blocked while taking damage
             case 'STANDING': return this.updateStading(TEMP.input, TEMP.status)
             case 'FLOATING': return this.updateFloating(TEMP.input)
             default: // nothing
@@ -417,6 +437,51 @@ export default class SwordHero {
 
     isStopping() {
         return Math.abs(this.velocity.x) < HALF_ACCEL
+    }
+
+    /**
+     * Configures listener for taking a hit from the enemy
+     * @param {Phaser.Physics.Arcade.Sprite} enemySprite Enemy sprite
+     */
+    handleEnemyHit(enemySprite, damage = 1) {
+        this.scene.physics.add.overlap(this.sprite, enemySprite, (_p, _) => {
+            if (this.takingDamage) { return } // cannot take damage WHILE taking damage
+            this.takeDamage(damage)
+            this.recoil()
+        })
+    }
+
+    /**
+     * Sets a function to be invoked upon taking damage
+     * @param {Function} f Take damage callback
+     */
+    setOnTakeDamage(f) {
+        this.onTakeDamage = f
+    }
+
+    takeDamage(damage = 1) {
+        this.damage += damage
+        this.onTakeDamage()
+        if (this.damage >= this.health) { this.die() }
+        return this
+    }
+
+    recoil() {
+        const { speedX, speedY, duration } = TAKE_DAMAGE_INFO
+        const velX = this.facingRight ? (-speedX) : speedX
+        const velY = -speedY
+        this.playAnim(TAKE_DAMAGE_INFO.animKey, true)
+        this.setVelocityX(velX)
+        this.setVelocityY(velY)
+        this.setAccelerationX(0)
+        this.setAccelerationY(0)
+        this.takingDamage = true
+        this.sprite.setTint(0xff0000)
+        this.scene.time.delayedCall(duration, () => {
+            this.takingDamage = false
+            this.sprite.clearTint()
+        })
+        return this
     }
 
     stopMovement() {
