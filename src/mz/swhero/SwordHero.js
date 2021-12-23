@@ -31,6 +31,7 @@ const EMPTY_LAMBDA = () => { }
 
 const STAND_ATTACK_INFO = { animKey: 'unsheath_and_attack', duration: 400 }
 const TAKE_DAMAGE_INFO = { animKey: 'take_damage', duration: 300, speedX: 250, speedY: 300 }
+const FLOAT_ATTACK_INFO = { animKey: 'float_attack', duration: 300 }
 const BODY_SCALING_FACTOR = { w: 0.3, h: 0.8 }
 
 // variables temporales para ahorrar memoria
@@ -39,7 +40,7 @@ const TEMP = {
     status: { position: 'STANDING', action: 'NONE' } // hero's position & action status
 }
 
-class StandAttackHitbox extends Hitbox {
+class HeroHitbox extends Hitbox {
     /**
      * @param {Phaser.Scene} scene Escena del juego
      * @param {SwordHero} hero Sword hero reference
@@ -47,7 +48,6 @@ class StandAttackHitbox extends Hitbox {
     constructor(scene, hero) {
         super(scene)
         this.hero = hero
-        this.init({ x: 0, y: 0, w: 60, h: 20 })
     }
 
     attack() {
@@ -68,6 +68,28 @@ class StandAttackHitbox extends Hitbox {
     }
 }
 
+class StandAttackHitbox extends HeroHitbox {
+    /**
+     * @param {Phaser.Scene} scene Escena del juego
+     * @param {SwordHero} hero Sword hero reference
+     */
+    constructor(scene, hero) {
+        super(scene, hero)
+        this.init({ x: 0, y: 0, w: 60, h: 20 })
+    }
+}
+
+class FloatAttackHitbox extends HeroHitbox {
+    /**
+     * @param {Phaser.Scene} scene Escena del juego
+     * @param {SwordHero} hero Sword hero reference
+     */
+    constructor(scene, hero) {
+        super(scene, hero)
+        this.init({ x: 0, y: 0, w: 65, h: 50 })
+    }
+}
+
 export default class SwordHero {
     /** @type{Phaser.Scene} */                                      scene = null
     /** @type{Phaser.Types.Physics.Arcade.SpriteWithDynamicBody} */ sprite = null
@@ -76,6 +98,7 @@ export default class SwordHero {
     /** @type{boolean} Controla si el personaje puede girar */      canSpin = false
     /** @type{number} El frame en el que el jugador reboto */       bounceFrame = DEFAULT_BOUNCE_FRAME
     /** @type{StandAttackHitbox} Hitbox de ataques */               standHitbox = null
+    /** @type{FloatAttackHitbox} Hitbox de ataque aereo */          floatHitbox = null
     /** @type{Boolean} Indica si el heroe esta girando */           spinning = false
     /** @type{Boolean} Indica si el heroe esta atacando */          attacking = false
     /** @type{number} Hero's max health */                          health = 3
@@ -157,6 +180,13 @@ export default class SwordHero {
                 duration: TAKE_DAMAGE_INFO.duration,
                 repeat: 0
             })
+
+            scene.anims.create({
+                key: FLOAT_ATTACK_INFO.animKey,
+                frames: scene.anims.generateFrameNumbers(heroKey, { start: 95, end: 99 }),
+                duration: FLOAT_ATTACK_INFO.duration,
+                repeat: 0
+            })
         })
 
         this.sprite = sprite
@@ -166,6 +196,7 @@ export default class SwordHero {
 
         /* Inicializacion del hitbox de golpe */
         this.standHitbox = new StandAttackHitbox(scene, this)
+        this.floatHitbox = new FloatAttackHitbox(scene, this)
     }
 
     get body() { return this.sprite.body }
@@ -339,6 +370,7 @@ export default class SwordHero {
      */
     handleAttackingEnemy(enemySprite, hitCallback) {
         this.scene.physics.add.overlap(this.standHitbox.sprite, enemySprite, () => hitCallback())
+        this.scene.physics.add.overlap(this.floatHitbox.sprite, enemySprite, () => hitCallback())
     }
 
     /**
@@ -373,6 +405,7 @@ export default class SwordHero {
      */
     update() {
         this.standHitbox.update()
+        this.floatHitbox.update()
 
         TEMP.input = this.inputManager.currentInput
         TEMP.status = this.parseStatus()
@@ -395,18 +428,17 @@ export default class SwordHero {
         switch (status.action) {
             case 'ATTACKING':
                 return this.isStopping() ? this.stopMovement() : this.decelerate()
-            default:
-                switch (input.action) {
-                    case 'ATTACK': return this.standAttack()
-                    case 'JUMP': return this.jump()
-                    default: // no action button pressed 
-                        switch (input.dir) {
-                            case 'LEFT': return this.walkLeft()
-                            case 'RIGHT': return this.walkRight()
-                            default: // no direction button pressed
-                                return this.isStopping() ? this.haltAndStand() : this.walkSlower()
-                        }
-                }
+            default: switch (input.action) {
+                case 'ATTACK': return this.tryToStandAttack()
+                case 'JUMP': return this.jump()
+                default: // no action button pressed 
+                    switch (input.dir) {
+                        case 'LEFT': return this.walkLeft()
+                        case 'RIGHT': return this.walkRight()
+                        default: // no direction button pressed
+                            return this.isStopping() ? this.haltAndStand() : this.walkSlower()
+                    }
+            }
         }
     }
 
@@ -417,8 +449,8 @@ export default class SwordHero {
     updateFloating(input) {
         this.capDropSpeed()
 
-        // en el aire
         switch (input.action) {
+            case 'ATTACK': return this.tryToFloatAttack()
             case 'JUMP': return this.tryToSpin()
             default: switch (input.dir) {
                 case 'LEFT': return this.floatLeft()
@@ -529,6 +561,12 @@ export default class SwordHero {
         this.scene.time.delayedCall(SPIN_TIMEOUT_MS, this.enableSpin, [], this)
     }
 
+    tryToStandAttack() {
+        if (!this.attacking) {
+            this.standAttack()
+        }
+    }
+
     standAttack() {
         this.attacking = true
         this.setAccelerationX(0)
@@ -541,6 +579,27 @@ export default class SwordHero {
         }, STAND_ATTACK_INFO.duration
             , () => {
                 this.standHitbox.disable()
+                this.attacking = false
+            })
+    }
+
+    tryToFloatAttack() {
+        if (!this.attacking) {
+            this.floatAttack()
+        }
+    }
+
+    floatAttack() {
+        this.attacking = true
+        this.withMotionBlock(() => {
+            this.playAnim(FLOAT_ATTACK_INFO.animKey, true)
+            this.scene.time.delayedCall(FLOAT_ATTACK_INFO.duration * 0.25, () => {
+                // delay the attack hitbox re-positioning to have animation and hitbox in sync
+                this.floatHitbox.attack()
+            }, [], this)
+        }, FLOAT_ATTACK_INFO.duration
+            , () => {
+                this.floatHitbox.disable()
                 this.attacking = false
             })
     }
