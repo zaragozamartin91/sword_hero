@@ -358,32 +358,34 @@ export default class SwordHero {
         TEMP.input = this.inputManager.currentInput
         TEMP.status = this.parseStatus()
 
-        switch (TEMP.status.action) {
-            case 'ATTACKING':
-                return this.isStopping() ? this.stopMovement() : this.decelerate()
-            default: switch (TEMP.status.position) {
-                case 'STANDING': return this.updateStading(TEMP.input)
-                case 'FLOATING': return this.updateFloating(TEMP.input)
-                default: // nothing
-            }
+        switch (TEMP.status.position) {
+            case 'STANDING': return this.updateStading(TEMP.input, TEMP.status)
+            case 'FLOATING': return this.updateFloating(TEMP.input)
+            default: // nothing
         }
     }
 
     /**
      * Updates sword hero while standing
      * @param {{action:string, dir:string}} input User input
+     * @param {{position:string, action:string}} status Sword hero status
      */
-    updateStading(input) {
+    updateStading(input, status) {
         // en el piso
-        switch (input.action) {
-            case 'ATTACK': return this.standAttack()
-            case 'JUMP': return this.jump()
-            default: // no action button pressed 
-                switch (input.dir) {
-                    case 'LEFT': return this.walkLeft()
-                    case 'RIGHT': return this.walkRight()
-                    default: // no direction button pressed
-                        return this.isStopping() ? this.haltAndStand() : this.walkSlower()
+        switch (status.action) {
+            case 'ATTACKING':
+                return this.isStopping() ? this.stopMovement() : this.decelerate()
+            default:
+                switch (input.action) {
+                    case 'ATTACK': return this.standAttack()
+                    case 'JUMP': return this.jump()
+                    default: // no action button pressed 
+                        switch (input.dir) {
+                            case 'LEFT': return this.walkLeft()
+                            case 'RIGHT': return this.walkRight()
+                            default: // no direction button pressed
+                                return this.isStopping() ? this.haltAndStand() : this.walkSlower()
+                        }
                 }
         }
     }
