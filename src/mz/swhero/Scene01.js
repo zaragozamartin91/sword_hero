@@ -9,6 +9,7 @@ import GlobalConfig from './GlobalConfig'
 import SwordHero from './SwordHero'
 import Camera from './Camera'
 import StaticEnemy from './StaticEnemy'
+import Healthbar from './Healthbar'
 
 // const PLAYER_START_POS = { x: 667, y: 2200 }
 const PLAYER_START_POS = { x: 150, y: 1100 }
@@ -30,6 +31,7 @@ export default class Scene01 extends BaseScene {
 
         this.score = 0
         this.scoreText = new GameText(this)
+        this.healthbar = new Healthbar(this)
         this.debugText = GlobalConfig.devProfile() ? new GameText(this) : VOID_DEBUG_TEXT
 
         this.bg = new Background(this)
@@ -39,11 +41,15 @@ export default class Scene01 extends BaseScene {
         this.mainCamera = new Camera(this)
 
         this.wasps = [
-            { pos: { x: 2400, y: 1050 }, enemy: StaticEnemy.newWasp(this), 
-            tweencfg: { props: { x: 2600 }, duration: 1500, yoyo: true, repeat: -1, flipX: false, hold: 200, repeatDelay: 200 }},
+            {
+                pos: { x: 2400, y: 1050 }, enemy: StaticEnemy.newWasp(this),
+                tweencfg: { props: { x: 2600 }, duration: 1500, yoyo: true, repeat: -1, flipX: false, hold: 200, repeatDelay: 200 }
+            },
 
-            { pos: { x: 4900, y: 1180 }, enemy: StaticEnemy.newWasp(this), 
-            tweencfg: { props: { x: 5350 }, duration: 1500, yoyo: true, repeat: -1, flipX: false, hold: 200, repeatDelay: 200 }},
+            {
+                pos: { x: 4900, y: 1180 }, enemy: StaticEnemy.newWasp(this),
+                tweencfg: { props: { x: 5350 }, duration: 1500, yoyo: true, repeat: -1, flipX: false, hold: 200, repeatDelay: 200 }
+            },
         ]
 
         this.crabs = [
@@ -81,7 +87,8 @@ export default class Scene01 extends BaseScene {
         super.create()
 
         this.scoreText.init(0, 0, 'Score: 0')
-        this.debugText.init(0, 32, '')
+        this.healthbar.init(0, 32)
+        this.debugText.init(0, 64, '')
         const wd = Scene01.getWorldDimensions()
         this.bg.init(wd.half_worldWidth, wd.half_worldHeight, wd.worldWidth, wd.worldHeight)
 
@@ -113,7 +120,8 @@ export default class Scene01 extends BaseScene {
 
 
         // loading sword hero ===================================================================================================
-        this.swordHero.init(PLAYER_START_POS.x, PLAYER_START_POS.y)
+        this.swordHero.init(PLAYER_START_POS.x, PLAYER_START_POS.y, { health: 3 })
+        this.healthbar.setMaxHealth(this.swordHero.health).update(0)
         this.swordHero.setInputManager(this.inputManager)
         this.swordHero.setOnDeath(() => {
             this.explosion.explode(this.swordHero.x, this.swordHero.y)
@@ -123,6 +131,9 @@ export default class Scene01 extends BaseScene {
                 this.swordHero.resurrect()
                 this.scene.restart()
             })
+        })
+        this.swordHero.setOnTakeDamage(() => {
+            this.healthbar.update(this.swordHero.damage)
         })
 
         //Let's drop a sprinkling of stars into the scene and allow the player to collect them ----------------------------------------------------
@@ -175,9 +186,7 @@ export default class Scene01 extends BaseScene {
         this.wasps.forEach(w => {
             const wasp = w.enemy
 
-            this.physics.add.collider(this.swordHero.sprite, wasp.sprite, (p, _) => {
-                this.swordHero.die()
-            })
+            this.swordHero.handleEnemyHit(wasp.sprite)
 
             if (w.tweencfg) { this.tweens.add({ ...w.tweencfg, targets: wasp }) }
             wasp.setOnDeath(() => this.explosion.explode(wasp.x, wasp.y, 3, 3))
@@ -189,9 +198,7 @@ export default class Scene01 extends BaseScene {
             // disable gravity on crab enemy upon collision to optimise calculations
             this.physics.add.collider(crab.sprite, worldLayer, () => crab.sprite.body.setAllowGravity(false))
 
-            this.physics.add.collider(this.swordHero.sprite, crab.sprite, (p, _) => {
-                this.swordHero.die()
-            })
+            this.swordHero.handleEnemyHit(crab.sprite)
 
             if (c.tweencfg) { this.tweens.add({ ...c.tweencfg, targets: crab }) }
             crab.setOnDeath(() => this.explosion.explode(crab.x, crab.y, 3, 3))
@@ -206,10 +213,10 @@ export default class Scene01 extends BaseScene {
         /* MANEJO DE CAMARA ----------------------------------------------------------------------------------------------------------- */
 
         // configure camera to follow player sprite
-        this.mainCamera.init({ 
-            playerSprite: this.swordHero.sprite, 
-            x: this.swordHero.sprite.x , 
-            y: CAMERA_POS.y ,
+        this.mainCamera.init({
+            playerSprite: this.swordHero.sprite,
+            x: this.swordHero.sprite.x,
+            y: CAMERA_POS.y,
             followHorizontal: true,
             followVertical: false
         })
