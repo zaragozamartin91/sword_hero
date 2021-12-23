@@ -30,6 +30,7 @@ const SPIN_ANGLE = 360 * 2
 const EMPTY_LAMBDA = () => { }
 
 const STAND_ATTACK_INFO = { animKey: 'unsheath_and_attack', duration: 400 }
+const TAKE_DAMAGE_INFO = { animKey: 'take_damage', duration: 200 }
 const BODY_SCALING_FACTOR = { w: 0.3, h: 0.8 }
 
 // variables temporales para ahorrar memoria
@@ -77,6 +78,8 @@ export default class SwordHero {
     /** @type{StandAttackHitbox} Hitbox de ataques */               standHitbox = null
     /** @type{Boolean} Indica si el heroe esta girando */           spinning = false
     /** @type{Boolean} Indica si el heroe esta atacando */          attacking = false
+    /** @type{number} Hero's max health */                          health = 3
+    /** @type{number} Hero's current damage */                      damage = 0
 
     /** @type{boolean} Determina si el personaje esta bloqueado para hacer movimientos */
     motionBlocked = false
@@ -90,11 +93,12 @@ export default class SwordHero {
     }
 
     /**
-     * Inicializa el jugador en una posicion.
-     * @param {Number} x Posicion x.
-     * @param {Number} y Posicion y.
+     * Initializes sword hero.
+     * @param {Number} x X position.
+     * @param {Number} y Y position.
+     * @param {{health: Number}} extras Extra parameters like health and stuff
      */
-    init(x, y) {
+    init(x, y, extras = { health: 3 }) {
         const scene = this.scene
         console.log('Loading sword hero!')
 
@@ -139,7 +143,14 @@ export default class SwordHero {
             scene.anims.create({
                 key: STAND_ATTACK_INFO.animKey,
                 frames: scene.anims.generateFrameNumbers(heroKey, { start: 47, end: 52 }),
-                duration: 400,
+                duration: STAND_ATTACK_INFO.duration,
+                repeat: 0
+            })
+
+            scene.anims.create({
+                key: TAKE_DAMAGE_INFO.animKey,
+                frames: scene.anims.generateFrameNumbers(heroKey, { frames: [123, 122, 121] }),
+                duration: TAKE_DAMAGE_INFO.duration,
                 repeat: 0
             })
         })
