@@ -1,6 +1,6 @@
 // @ts-check
 
-class ActionButton {
+export default class ActionButton {
     /**
      * 
      * @param {Phaser.Scene} scene Escena de juego
@@ -20,21 +20,41 @@ class ActionButton {
         return this
     }
 
+    /**
+     * Configures callback for pointerover event
+     * @param {Function} callback Callback function
+     * @returns {ActionButton} this
+     */
     pointerover(callback) {
         this.sprite.on('pointerover', callback)
         return this
     }
 
+    /**
+     * Configures callback for pointerout event
+     * @param {Function} callback Callback function
+     * @returns {ActionButton} this
+     */
     pointerout(callback) {
         this.sprite.on('pointerout', callback)
         return this
     }
 
+    /**
+     * Configures callback for pointerdown event
+     * @param {Function} callback Callback function
+     * @returns {ActionButton} this
+     */
     pointerdown(callback) {
         this.sprite.on('pointerdown', callback)
         return this
     }
 
+    /**
+     * Configures callback for pointerup event
+     * @param {Function} callback Callback function
+     * @returns {ActionButton} this
+     */
     pointerup(callback) {
         this.sprite.on('pointerup', callback)
         return this
@@ -62,5 +82,3 @@ class ActionButton {
         return this
     }
 }
-
-export default ActionButton

@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import Scene01 from './mz/swhero/Scene01'
+import MainMenuScene from './mz/swhero/MainMenuScene'
 import GlobalConfig from './mz/swhero/GlobalConfig'
 
 // set to either landscape
@@ -52,7 +53,8 @@ function startGame() {
         width: worldWidth,
         height: worldHeight,
         parent: 'main',
-        scene: [Scene01],
+        fullscreenTarget: 'main',
+        scene: [MainMenuScene, Scene01],
         physics: {
             default: 'arcade',
             arcade: { gravity: { y: GRAVITY_VAL }, debug: physicsDebug }
