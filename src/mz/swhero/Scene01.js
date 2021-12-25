@@ -10,6 +10,7 @@ import SwordHero from './SwordHero'
 import Camera from './Camera'
 import StaticEnemy from './StaticEnemy'
 import Healthbar from './Healthbar'
+import AssetLoader from './AssetLoader'
 
 // const PLAYER_START_POS = { x: 667, y: 2200 }
 const PLAYER_START_POS = { x: 150, y: 1100 }
@@ -80,11 +81,20 @@ export default class Scene01 extends BaseScene {
     preload() {
         console.log("PRELOAD")
         super.preload()
+
+        AssetLoader.loadFor(this, 'Buttons', () => {
+            // cargamos las imagenes de los botones
+            this.load.image('left_btn', 'assets/buttons/left.png')
+            this.load.image('right_btn', 'assets/buttons/right.png')
+            this.load.image('a_btn', 'assets/buttons/a.png')
+            this.load.image('b_btn', 'assets/buttons/b.png')
+        })
     }
 
     create() {
         console.log("CREATE")
         super.create()
+        this.initInputManager()
 
         this.scoreText.init(0, 0, 'Score: 0')
         this.healthbar.init(0, 32)

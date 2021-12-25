@@ -66,21 +66,24 @@ export default class BaseScene extends Phaser.Scene {
             this.load.image('background', 'assets/industrial-background.jpeg') // LOOKS GOOD
             this.load.image('factory_map', 'assets/factory_tiles.png')
             this.load.tilemapTiledJSON('factory_map', 'assets/factory_map.json')
-
-            // cargamos las imagenes de los botones
-            this.load.image('left_btn', 'assets/buttons/left.png')
-            this.load.image('right_btn', 'assets/buttons/right.png')
-            this.load.image('a_btn', 'assets/buttons/a.png')
-            this.load.image('b_btn', 'assets/buttons/b.png')
         })
     }
 
     create() {
+        // do nothing by default
+    }
+
+    update() {
+        // do nothing by default     
+    }
+
+    /**
+     * Initializes game input manager to manipulate main character
+     */
+    initInputManager() {
         const { worldWidth, worldHeight } = BaseScene.getWorldDimensions()
         this.inputManager.init(worldWidth, worldHeight)
     }
-
-    update() { throw new Error('Not implemented') }
 
     /**
      * Calcula un numero aleatorio entre dos limites

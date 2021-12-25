@@ -14,16 +14,11 @@ export default class AssetLoader {
      * @param {Function} loaderFunction loader function to delegate to in order to load assets
      */
     static loadFor(scene, itemName, loaderFunction) {
-        const sceneKey = scene.scene.key
-        
-        const sceneIsMissing = AssetLoader.allAssets[sceneKey] === undefined
-        if (sceneIsMissing) { AssetLoader.allAssets[sceneKey] = {} }
-
-        const itemIsMissing = AssetLoader.allAssets?.[sceneKey]?.[itemName] === undefined
+        const itemIsMissing = AssetLoader.allAssets[itemName] === undefined
         if (itemIsMissing) {
-            console.log('Loading item ', itemName, ' for scene ', sceneKey)
+            console.log('Loading item ', itemName, ' into scene ')
             loaderFunction()
-            AssetLoader.allAssets[sceneKey][itemName] = true
+            AssetLoader.allAssets[itemName] = true
         }
     }
 }
