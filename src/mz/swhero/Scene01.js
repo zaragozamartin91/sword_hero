@@ -3,7 +3,6 @@
 import Background from './Background'
 import GameText from './GameText'
 import Explosion from './Explosion'
-import BaseScene from './BaseScene'
 import Tileset from './Tileset'
 import GlobalConfig from './GlobalConfig'
 import SwordHero from './SwordHero'
@@ -11,6 +10,7 @@ import Camera from './Camera'
 import StaticEnemy from './StaticEnemy'
 import Healthbar from './Healthbar'
 import AssetLoader from './AssetLoader'
+import InteractiveScene from './InteractiveScene'
 
 // const PLAYER_START_POS = { x: 667, y: 2200 }
 const PLAYER_START_POS = { x: 150, y: 1100 }
@@ -19,7 +19,7 @@ const VOID_DEBUG_TEXT = { init: function () { }, setText: function () { } }
 const CAMERA_POS = { y: 1250 }
 
 
-export default class Scene01 extends BaseScene {
+export default class Scene01 extends InteractiveScene {
     /**
      * Crea una escena de juego
      */
@@ -82,19 +82,34 @@ export default class Scene01 extends BaseScene {
         console.log("PRELOAD")
         super.preload()
 
-        AssetLoader.loadFor(this, 'Buttons', () => {
-            // cargamos las imagenes de los botones
-            this.load.image('left_btn', 'assets/buttons/left.png')
-            this.load.image('right_btn', 'assets/buttons/right.png')
-            this.load.image('a_btn', 'assets/buttons/a.png')
-            this.load.image('b_btn', 'assets/buttons/b.png')
+        AssetLoader.loadFor(this, 'Items', () => {
+            this.load.image('star', 'assets/star.png')
+            this.load.image('bomb', 'assets/bomb.png')
+        })
+
+        AssetLoader.loadFor(this, 'Effects', () => {
+            //this.load.multiatlas('sparkle', 'assets/sparkle.json', 'assets') SPARKLE IS NOT NEEDED FOR NOW
+            this.load.multiatlas('explosion', 'assets/explosion.json', 'assets')
+        })
+
+        AssetLoader.loadFor(this, 'EnemySprites', () => {
+            // cargamos la imagen de la avispa
+            this.load.multiatlas('wasp', 'assets/wasp.json', 'assets')
+
+            // cargamos la imagen de la avispa
+            this.load.multiatlas('crab_walk', 'assets/crab_walk.json', 'assets')
+        })
+
+        AssetLoader.loadFor(this, 'FactoryMapSprites', () => {
+            this.load.image('background', 'assets/industrial-background.jpeg') // LOOKS GOOD
+            this.load.image('factory_map', 'assets/factory_tiles.png')
+            this.load.tilemapTiledJSON('factory_map', 'assets/factory_map.json')
         })
     }
 
     create() {
         console.log("CREATE")
         super.create()
-        this.initInputManager()
 
         this.scoreText.init(0, 0, 'Score: 0')
         this.healthbar.init(0, 32)

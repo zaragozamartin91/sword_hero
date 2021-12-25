@@ -53,6 +53,7 @@ function startGame() {
         width: worldWidth,
         height: worldHeight,
         parent: 'main',
+        fullscreenTarget: 'main',
         scene: [MainMenuScene, Scene01],
         physics: {
             default: 'arcade',

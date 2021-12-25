@@ -38,6 +38,8 @@ export default class MainMenuScene extends BaseScene {
         const startBtnPos = { x: startBtnTextPos.x + startBtnText.width / 2, y: startBtnTextPos.y + startBtnText.height / 2 }
         const rectangle = this.add.rectangle(startBtnPos.x, startBtnPos.y, startBtnDims.w, startBtnDims.h, 0xABCDEF, 1)
         rectangle.setInteractive()
-        rectangle.on('pointerdown', () => this.startAnotherScene('Scene01'))
+        rectangle.on('pointerdown', () => {
+            this.startAnotherScene('Scene01')
+        })
     }
 }
