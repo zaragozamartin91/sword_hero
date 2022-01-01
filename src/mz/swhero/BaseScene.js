@@ -6,6 +6,8 @@ import AssetLoader from './AssetLoader'
 const WORLD_DIMS = { worldWidth: 0, worldHeight: 0, half_worldWidth: 0, half_worldHeight: 0 }
 
 export default class BaseScene extends Phaser.Scene {
+    static profile = 'production'
+
     /**
      * Crea una escena base
      * @param {string} sceneName Nombre de escena

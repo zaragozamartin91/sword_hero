@@ -16,16 +16,16 @@ class GlobalConfig {
      * Determina si el perfil de desarrollo esta activado
      * @returns {boolean} True si el perfil es dev, false en caso contrario
      */
-    static devProfile() {
+    static devProfileEnabled() {
         const p = gconfig.profile.toLowerCase()
-        return p == 'dev' || p == 'development'
+        return p == 'dev' || p == 'development' || p == 'develop'
     }
 
         /**
      * Determina si el perfil de produccion esta activado
      * @returns {boolean} True si el perfil es prod, false en caso contrario
      */
-    static prodProfile() {
+    static prodProfileEnabled() {
         const p = gconfig.profile.toLowerCase()
         return p == 'prod' || p == 'production'
     }

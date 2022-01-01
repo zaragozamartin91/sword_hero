@@ -7,11 +7,10 @@ const path = require('path')
 const bodyParser = require("body-parser")
 const app = module.exports = express()
 
-// Path to our public directory
-
+// Path to the static resources directory
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
-app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'docs')))
 
 
 // Without this you would need to
