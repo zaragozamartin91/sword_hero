@@ -15,7 +15,7 @@ De esta manera se genera el archivo `docs/main.js` que contiene el codigo produc
 
 ## Abrir juego en browser
 
-Correr `npm start` y abrir una ventana del browser en `localhost:8080`.
+Correr `npm start` y abrir una ventana del browser en `localhost:8080/sword_hero`.
 
 ## Desarrollo
 
