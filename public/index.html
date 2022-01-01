@@ -6,6 +6,7 @@
     <meta name="msapplication-tap-highlight" content="no">
     <!-- <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"> -->
     <meta name="viewport" content="user-scalable=no, initial-scale=1.0, width=device-width">
+    <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" type="text/css" href="css/index.css">
     <link rel="shortcut icon" href="favicon.ico" />
     <title>swordHero</title>
@@ -19,6 +20,27 @@
 
         <!-- <button>Hello</button> -->
     </div>
+
+    <script>
+        window.addEventListener('load', () => {
+            registerSW();
+        });
+
+        // Register the Service Worker
+        async function registerSW() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    await navigator
+                        .serviceWorker
+                        .register('serviceworker.js');
+                }
+                catch (e) {
+                    console.log('SW registration failed');
+                }
+            }
+        }
+    </script>
+
 
     <script type="text/javascript" src="js/main.js"></script>
 </body>
