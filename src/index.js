@@ -17,28 +17,12 @@ const GRAVITY_VAL = 1200
 document.onreadystatechange = function () {
     console.log("onreadystatechange CALLED!")
     if (document.readyState === 'complete') {
-        console.log('DOM is ready.')
-
-        console.log('Fetching configuration')
-
-        httpGetAsync('/config', responseText => {
-            const config = JSON.parse(responseText)
-            console.log('Configuration is ', config)
-            GlobalConfig.setProfile(config.profile)
-            startGame()
-        })
+        const params = new URLSearchParams(window.location.search)
+        const profile = params.get("profile") || "production"
+        GlobalConfig.setProfile(profile)
+        startGame()
     }
-};
-
-function httpGetAsync(theUrl, callback) {
-    const xmlHttp = new XMLHttpRequest()
-    xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) callback(xmlHttp.responseText)
-    }
-    xmlHttp.open("GET", theUrl, true) // true for asynchronous 
-    xmlHttp.send(null)
 }
-
 
 function startGame() {
     const worldWidth = Math.min(window.innerWidth, MAX_WIDTH);
@@ -46,7 +30,7 @@ function startGame() {
 
     Scene01.setWorldDimensions(worldWidth, worldHeight)
 
-    const physicsDebug = GlobalConfig.devProfile()
+    const physicsDebug = GlobalConfig.devProfileEnabled()
 
     let config = {
         type: Phaser.AUTO,

@@ -33,7 +33,7 @@ export default class Scene01 extends InteractiveScene {
         this.score = 0
         this.scoreText = new GameText(this)
         this.healthbar = new Healthbar(this)
-        this.debugText = GlobalConfig.devProfile() ? new GameText(this) : VOID_DEBUG_TEXT
+        this.debugText = GlobalConfig.devProfileEnabled() ? new GameText(this) : VOID_DEBUG_TEXT
 
         this.bg = new Background(this)
 
@@ -125,7 +125,7 @@ export default class Scene01 extends InteractiveScene {
             .createLayer('death')
             .setCollisionByProperty('world', { stand: true, bounce: true })
             .setCollisionByProperty('death', { deadly: true })
-        if (GlobalConfig.devProfile()) {
+        if (GlobalConfig.devProfileEnabled()) {
             this.tileset.renderDebug('world')
             this.tileset.renderDebug('death', { red: 50, green: 255, blue: 255, alpha: 255 })
         }

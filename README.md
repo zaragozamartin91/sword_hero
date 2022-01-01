@@ -11,11 +11,11 @@ Side scroller en donde la espada se usa como herramienta.
 Antes de pushear cambios al repo, compilar el juego para produccion:
 * Correr `npm run compile_prod`.
 
-De esta manera se genera el archivo `public/main.js` que contiene el codigo productivo del juego compilado con webpack
+De esta manera se genera el archivo `docs/main.js` que contiene el codigo productivo del juego compilado con webpack
 
 ## Abrir juego en browser
 
-Correr `npm start` y abrir una ventana del browser en `localhost:8080`.
+Correr `npm start` y abrir una ventana del browser en `localhost:8080/sword_hero`.
 
 ## Desarrollo
 

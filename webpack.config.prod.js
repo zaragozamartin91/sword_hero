@@ -8,7 +8,7 @@ module.exports = merge(base, { // Merging this config with base.js // config
    mode: 'production', // enable webpack's built-in optimizations  // that correspond to production
    output: {
       filename: 'main.js',
-      path: path.resolve(__dirname, 'public', 'js')
+      path: path.resolve(__dirname, 'docs', 'js')
    },
    devtool: false, // We don't need this in our production
    performance: {

@@ -8,7 +8,7 @@ module.exports = {
    entry: './src/index.js',
    output: {
       filename: 'main.js',
-      path: path.resolve(__dirname, 'public', 'js')
+      path: path.resolve(__dirname, 'docs', 'js')
    },
    devtool: 'inline-source-map', // Each module is executed with eval() and a SourceMap is added as a DataUrl to the eval().  Initially it is slow, but it provides fast rebuild speed and yields real files
    module: { 
@@ -35,7 +35,7 @@ module.exports = {
       }), // config webpack to handle renderer swapping in our app
    ],
    watchOptions: {
-      ignored: ['**/node_modules', '**/public'],
+      ignored: ['**/node_modules', '**/docs'],
       poll: 2000 // poll every 2 seconds
     },  
 }
