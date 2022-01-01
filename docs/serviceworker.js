@@ -1,26 +1,18 @@
 var staticCacheName = "swordHero-v1";
 
 self.addEventListener("install", function (e) {
+    console.log('Service worker INSTALL event running')
     e.waitUntil(
         caches.open(staticCacheName).then(function (cache) {
-            const contentToCache = [
+            // const contentToCache = [
 
-            ]
-            return cache.addAll(["/"]);
+            // ]
+            // return cache.addAll(["/"]);
+            return Promise.resolve() // cache nothing for now...
         })
     );
 });
 
-// self.addEventListener("fetch", function (event) {
-//     console.log(`[Service Worker] Fetched resource ${e.request.url}`);
-//     console.log(event.request.url);
-
-//     event.respondWith(
-//         caches.match(event.request).then(function (response) {
-//             return response || fetch(event.request);
-//         })
-//     );
-// });
 
 self.addEventListener('fetch', (e) => {
     e.respondWith((async () => {
