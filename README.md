@@ -17,6 +17,8 @@ De esta manera se genera el archivo `docs/main.js` que contiene el codigo produc
 
 Correr `npm start` y abrir una ventana del browser en `localhost:8080/sword_hero`.
 
+Para correr el juego en modo debug, lanzar el juego desde `localhost:8080/sword_hero?profile=dev`
+
 ## Desarrollo
 
 Correr `npm run compile_watch` para iniciar una configuracion de webpack que constantemente monitoree cambios en el codebase y recompile automaticamente.

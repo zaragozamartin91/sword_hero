@@ -1,11 +1,15 @@
 // @ts-check
 
+// temp vars to avoid using extra memory
+const TEMP = { posX: 0, posY: 0 }
+
 export default class Camera {
     /** @type{Phaser.Scene} Game scene*/                            scene = null
     /** @type{Phaser.GameObjects.GameObject} player sprite */       playerSprite = null
     /** @type{Phaser.GameObjects.Rectangle} camera's focus point*/  focusPoint = null
     /** @type{boolean} follow player horizontally */                followHorizontal = false
     /** @type{boolean} follow player vertically */                  followVertical = false
+    /** @type{number} camera limit downward Y axis */               lowerBound = Number.MAX_SAFE_INTEGER
 
     /**
      * Builds a Camera instance
@@ -23,7 +27,7 @@ export default class Camera {
      * 
      * @param {{
      * playerSprite: Phaser.GameObjects.GameObject , 
-     * x: number , 
+     * x: number ,
      * y: number,
      * followHorizontal:boolean, 
      * followVertical: boolean}} cameraConfig Camera config params 
@@ -44,13 +48,30 @@ export default class Camera {
         return this
     }
 
+    /**
+     * @param {number} lowerBound Lower bound value
+     */
+    withLowerBound(lowerBound) {
+        this.lowerBound = lowerBound
+        return this
+    }
+
     update() {
-        this.focusPoint.setPosition(
+        if (this.followHorizontal) {
             // @ts-ignore
-            this.followHorizontal ? this.playerSprite.x : this.focusPoint.x,
+            TEMP.posX = this.playerSprite.x
+        } else {
+            TEMP.posX = this.focusPoint.x
+        }
+
+        if (this.followVertical) {
             // @ts-ignore
-            this.followVertical ? this.playerSprite.y : this.focusPoint.y
-        )
+            TEMP.posY = Math.min(this.playerSprite.y, this.lowerBound)
+        } else {
+            TEMP.posY = this.focusPoint.y
+        }
+
+        this.focusPoint.setPosition(TEMP.posX, TEMP.posY)
     }
 
     fadeOut(duration = 1000, colors = { r: 0, g: 0, b: 0 }) {

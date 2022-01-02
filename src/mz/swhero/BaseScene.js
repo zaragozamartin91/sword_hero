@@ -34,6 +34,37 @@ export default class BaseScene extends Phaser.Scene {
         return { worldWidth, worldHeight, half_worldWidth, half_worldHeight }
     }
 
+    /**
+     * Sets game profile
+     * @param {string} prof Game profile (e.g. 'develop')
+     */
+    static setProfile(prof) {
+        BaseScene.profile = prof
+    }
+
+    /**
+     * Determina si el perfil de desarrollo esta activado
+     * @returns {boolean} True si el perfil es dev, false en caso contrario
+     */
+    static devProfileEnabled() {
+        const p = BaseScene.profile.toLowerCase()
+        return p == 'dev' || p == 'development' || p == 'develop'
+    }
+
+    /**
+     * Determina si el perfil de produccion esta activado
+     * @returns {boolean} True si el perfil es prod, false en caso contrario
+     */
+    static prodProfileEnabled() {
+        const p = BaseScene.profile.toLowerCase()
+        return p == 'prod' || p == 'production'
+    }
+
+    static smallScreen() {
+        const { worldWidth, worldHeight } = this.getWorldDimensions()
+        return worldWidth < 760 || worldHeight < 760
+    }
+
     get worldDims() {
         return BaseScene.getWorldDimensions()
     }

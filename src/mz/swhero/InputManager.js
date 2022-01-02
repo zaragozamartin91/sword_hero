@@ -2,6 +2,9 @@
 
 import ActionButton from "./ActionButton"
 
+// declaring temp global vars to save memory
+const TEMP = { currIn: { dir: 'NONE', action: 'NONE' } }
+
 export default class InputManager {
     /**
      * Escena de juego
@@ -92,23 +95,22 @@ export default class InputManager {
     }
 
     get currentInput() {
-        const currIn = {}
         if (this.checkRightPress()) {
-            currIn.dir = 'RIGHT'
+            TEMP.currIn.dir = 'RIGHT'
         } else if (this.checkLeftPress()) {
-            currIn.dir = 'LEFT'
+            TEMP.currIn.dir = 'LEFT'
         } else {
-            currIn.dir = 'NONE'
+            TEMP.currIn.dir = 'NONE'
         }
 
         if (this.checkAttackPress()) {
-            currIn.action = 'ATTACK'
+            TEMP.currIn.action = 'ATTACK'
         } else if (this.checkJumpPress()) {
-            currIn.action = 'JUMP'
+            TEMP.currIn.action = 'JUMP'
         } else {
-            currIn.action = 'NONE'
+            TEMP.currIn.action = 'NONE'
         }
 
-        return currIn
+        return TEMP.currIn
     }
 }

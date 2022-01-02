@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 import Scene01 from './mz/swhero/Scene01'
 import MainMenuScene from './mz/swhero/MainMenuScene'
-import GlobalConfig from './mz/swhero/GlobalConfig'
+import BaseScene from './mz/swhero/BaseScene'
 
 // set to either landscape
 if (!navigator.xr && self.isMobile && screen.orientation && screen.orientation.lock) {
@@ -9,17 +9,18 @@ if (!navigator.xr && self.isMobile && screen.orientation && screen.orientation.l
 }
 
 
-const MAX_WIDTH = 1024
+const MAX_WIDTH = 1366
 const MAX_HEIGHT = 768
 const GRAVITY_VAL = 1200
 
 
 document.onreadystatechange = function () {
     console.log("onreadystatechange CALLED!")
+    const params = new URLSearchParams(window.location.search)
+    const profile = params.get("profile") || "production"
+    BaseScene.setProfile(profile)
     if (document.readyState === 'complete') {
-        const params = new URLSearchParams(window.location.search)
-        const profile = params.get("profile") || "production"
-        GlobalConfig.setProfile(profile)
+        document.body.style.overflow = 'hidden' // hiding the scroll bar
         startGame()
     }
 }
@@ -28,9 +29,8 @@ function startGame() {
     const worldWidth = Math.min(window.innerWidth, MAX_WIDTH);
     const worldHeight = Math.min(window.innerHeight, MAX_HEIGHT);
 
-    Scene01.setWorldDimensions(worldWidth, worldHeight)
-
-    const physicsDebug = GlobalConfig.devProfileEnabled()
+    BaseScene.setWorldDimensions(worldWidth, worldHeight)
+    const physicsDebugEnabled = BaseScene.devProfileEnabled()
 
     let config = {
         type: Phaser.AUTO,
@@ -41,7 +41,7 @@ function startGame() {
         scene: [MainMenuScene, Scene01],
         physics: {
             default: 'arcade',
-            arcade: { gravity: { y: GRAVITY_VAL }, debug: physicsDebug }
+            arcade: { gravity: { y: GRAVITY_VAL }, debug: physicsDebugEnabled }
         },
         scale: {
             mode: Phaser.Scale.FIT,
