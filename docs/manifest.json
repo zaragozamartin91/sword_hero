@@ -11,6 +11,6 @@
     "description": "Sword hero platformer",
     "start_url": "/sword_hero/index.html",
     "id": "/sword_hero/index.html",
-    "display": "standalone",
-    "orientation": "landscape"
+    "display": "fullscreen",
+    "orientation": "portrait"
   }

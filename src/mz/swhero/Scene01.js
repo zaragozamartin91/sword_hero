@@ -4,7 +4,6 @@ import Background from './Background'
 import GameText from './GameText'
 import Explosion from './Explosion'
 import Tileset from './Tileset'
-import GlobalConfig from './GlobalConfig'
 import SwordHero from './SwordHero'
 import Camera from './Camera'
 import StaticEnemy from './StaticEnemy'
@@ -33,7 +32,7 @@ export default class Scene01 extends InteractiveScene {
         this.score = 0
         this.scoreText = new GameText(this)
         this.healthbar = new Healthbar(this)
-        this.debugText = GlobalConfig.devProfileEnabled() ? new GameText(this) : VOID_DEBUG_TEXT
+        this.debugText = Scene01.devProfileEnabled() ? new GameText(this) : VOID_DEBUG_TEXT
 
         this.bg = new Background(this)
 
@@ -125,7 +124,7 @@ export default class Scene01 extends InteractiveScene {
             .createLayer('death')
             .setCollisionByProperty('world', { stand: true, bounce: true })
             .setCollisionByProperty('death', { deadly: true })
-        if (GlobalConfig.devProfileEnabled()) {
+        if (Scene01.devProfileEnabled()) {
             this.tileset.renderDebug('world')
             this.tileset.renderDebug('death', { red: 50, green: 255, blue: 255, alpha: 255 })
         }
@@ -184,29 +183,29 @@ export default class Scene01 extends InteractiveScene {
 
         //This tells Phaser to check for an overlap between the player and any star in the stars Group
         this.physics.add.overlap(this.swordHero.sprite, this.stars, (_, star) => {
-            star.disableBody(true, true);
+            star.disableBody(true, true)
 
-            this.score += 10;
-            this.scoreText.setText('Score: ' + this.score);
+            this.score += 10
+            this.scoreText.setText('Score: ' + this.score)
 
             //We use a Group method called countActive to see how many this.stars are left alive
             if (this.stars.countActive(true) === 0) {
                 //enableBody(reset, x, y, enableGameObject, showGameObject)
-                this.stars.children.iterate(child => child.enableBody(true, child.x, PLAYER_START_POS.y, true, true));
-                let x = this.numberBetween(PLAYER_START_POS.x, PLAYER_START_POS.x + 300);
+                this.stars.children.iterate(child => child.enableBody(true, child.x, PLAYER_START_POS.y, true, true))
+                let x = this.numberBetween(PLAYER_START_POS.x, PLAYER_START_POS.x + 300)
 
-                let bomb = this.bombs.create(x, PLAYER_START_POS.y, 'bomb');
-                bomb.setBounce(1);
-                bomb.setCollideWorldBounds(false);
-                bomb.setVelocity(this.numberBetween(-200, 200), 20);
+                let bomb = this.bombs.create(x, PLAYER_START_POS.y, 'bomb')
+                bomb.setBounce(1)
+                bomb.setCollideWorldBounds(false)
+                bomb.setVelocity(this.numberBetween(-200, 200), 20)
             }
-        });
+        })
 
-        this.physics.add.collider(this.bombs, worldLayer);
+        this.physics.add.collider(this.bombs, worldLayer)
 
         this.physics.add.collider(this.swordHero.sprite, this.bombs, (p, _) => {
             this.swordHero.die()
-        });
+        })
 
         this.wasps.forEach(w => {
             const wasp = w.enemy
@@ -266,11 +265,13 @@ export default class Scene01 extends InteractiveScene {
         }
 
 
-        this.debugText.setText(`X: ${Math.round(this.swordHero.x)} ; Y: ${Math.round(this.swordHero.y)}, 
+        if(Scene01.devProfileEnabled()) {
+            this.debugText.setText(`X: ${Math.round(this.swordHero.x)} ; Y: ${Math.round(this.swordHero.y)}, 
 p1x: ${Math.round(this.input.pointer1.x)} ; p2x: ${Math.round(this.input.pointer2.x)}
 acx: ${Math.round(this.swordHero.body.acceleration.x)} ; acy: ${Math.round(this.swordHero.body.acceleration.y)},
 vx: ${Math.round(this.swordHero.velocity.x)} ; vy: ${Math.round(this.swordHero.velocity.y)},
 blockedDown: ${this.swordHero.blockedDown()}
 canSpin: ${this.swordHero.canSpin}`)
+        }
     }
 }
