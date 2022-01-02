@@ -60,6 +60,11 @@ export default class BaseScene extends Phaser.Scene {
         return p == 'prod' || p == 'production'
     }
 
+    static smallScreen() {
+        const { worldWidth, worldHeight } = this.getWorldDimensions()
+        return worldWidth < 760 || worldHeight < 760
+    }
+
     get worldDims() {
         return BaseScene.getWorldDimensions()
     }

@@ -15,7 +15,7 @@ import InteractiveScene from './InteractiveScene'
 const PLAYER_START_POS = { x: 150, y: 1100 }
 const ABYSS_LIMIT = 1800
 const VOID_DEBUG_TEXT = { init: function () { }, setText: function () { } }
-const CAMERA_POS = { y: 1250 }
+const CAMERA_CONFIG = { y: 1250, lowerBound: 1275 }
 
 
 export default class Scene01 extends InteractiveScene {
@@ -237,13 +237,14 @@ export default class Scene01 extends InteractiveScene {
         /* MANEJO DE CAMARA ----------------------------------------------------------------------------------------------------------- */
 
         // configure camera to follow player sprite
+        const cameraFollowVertical = Scene01.smallScreen()
         this.mainCamera.init({
             playerSprite: this.swordHero.sprite,
             x: this.swordHero.sprite.x,
-            y: CAMERA_POS.y,
+            y: CAMERA_CONFIG.y,
             followHorizontal: true,
-            followVertical: false
-        })
+            followVertical: cameraFollowVertical
+        }).withLowerBound(CAMERA_CONFIG.lowerBound)
         this.mainCamera.fadeIn() // fade in at start of scene
 
         // resetting score
