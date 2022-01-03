@@ -230,9 +230,13 @@ export default class Scene01 extends InteractiveScene {
         })
 
         /* Si el jugador toca un objeto de la capa 'death' este muere */
-        this.physics.add.overlap(deathLayer, this.swordHero.sprite, this.swordHero.die, (_w, tile) => {
-            return this.swordHero.checkHazard(tile)
-        }, this.swordHero)
+        this.physics.add.overlap(
+            deathLayer,
+            this.swordHero.sprite,
+            () => this.swordHero.getHit(),
+            (_w, tile) => { return this.swordHero.checkHazard(tile) },
+            this.swordHero
+        )
 
         /* MANEJO DE CAMARA ----------------------------------------------------------------------------------------------------------- */
 
@@ -266,7 +270,7 @@ export default class Scene01 extends InteractiveScene {
         }
 
 
-        if(Scene01.devProfileEnabled()) {
+        if (Scene01.devProfileEnabled()) {
             this.debugText.setText(`X: ${Math.round(this.swordHero.x)} ; Y: ${Math.round(this.swordHero.y)}, 
 p1x: ${Math.round(this.input.pointer1.x)} ; p2x: ${Math.round(this.input.pointer2.x)}
 acx: ${Math.round(this.swordHero.body.acceleration.x)} ; acy: ${Math.round(this.swordHero.body.acceleration.y)},

@@ -28,6 +28,8 @@ export default class Hitbox {
 
     get body() { return this.sprite.body }
 
+    get width() { return this.sprite.width }
+
     /**
      * Establece la posicion.
      * @param {Number} x posicion x.
