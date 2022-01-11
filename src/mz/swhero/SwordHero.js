@@ -1,6 +1,7 @@
 // @ts-check
 
 import AssetLoader from './AssetLoader'
+import Geometry from './Geometry'
 import Hitbox from './Hitbox'
 import InputManager from './InputManager'
 
@@ -55,16 +56,17 @@ class HeroHitbox extends Hitbox {
         this.enable(x, y)
     }
 
-    calculatePosition() {
-        const attackOffset = this.hero.facingLeft ? (-this.hero.width) : this.hero.width
-        return { x: this.hero.x + attackOffset * BODY_SCALING_FACTOR.w, y: this.hero.y }
-    }
-
     update() {
         if (this.enabled) {
             const { x, y } = this.calculatePosition()
             this.setPosition(x, y)
         }
+    }
+
+    calculatePosition() {
+        const widthDiff = Math.abs(this.hero.width - this.width)
+        const attackOffset = this.hero.facingLeft ? (-widthDiff) : widthDiff
+        return { x: this.hero.x + attackOffset / 2, y: this.hero.y }
     }
 }
 
@@ -131,7 +133,7 @@ export default class SwordHero {
 
         const heroKey = 'sword_hero'
         const sprite = scene.physics.add.sprite(x, y, heroKey)
-        sprite.setScale(2, 2)
+        sprite.setScale(2, 2) // scaling up the sprite
         // carefully configuring hitbox correctly...
         sprite.body.setSize(sprite.body.width * BODY_SCALING_FACTOR.w, sprite.body.height * BODY_SCALING_FACTOR.h)
         sprite.body.setOffset(sprite.body.offset.x, 6)
@@ -207,11 +209,16 @@ export default class SwordHero {
 
     get angularAcceleration() { return this.body.angularAcceleration }
 
+    /** Returns X center coordinate */
     get x() { return this.sprite.x }
 
+    /** Returns Y center coordinate */
     get y() { return this.sprite.y }
 
-    get width() { return this.sprite.width }
+    get width() {
+        // using body width instead of sprite width due to body hitbox scaling (see this.init method) 
+        return this.body.width
+    }
 
     get height() { return this.sprite.height }
 
@@ -477,10 +484,25 @@ export default class SwordHero {
      */
     handleEnemyHit(enemySprite, damage = 1) {
         this.scene.physics.add.overlap(this.sprite, enemySprite, (_p, _) => {
-            if (this.takingDamage) { return } // cannot take damage WHILE taking damage
-            this.takeDamage(damage)
-            this.recoil()
+            this.getHit(damage)
         })
+    }
+
+    /**
+     * Takes damage and recoils
+     * @param {number} damage Damage to receive
+     */
+    getHit(damage = 1) {
+        if (this.takingDamage) { return } // cannot take damage WHILE taking damage
+        this.takeDamage(damage)
+        this.recoil()
+    }
+
+    takeDamage(damage = 1) {
+        this.damage += damage
+        this.onTakeDamage()
+        if (this.damage >= this.health) { this.die() }
+        return this
     }
 
     /**
@@ -489,13 +511,6 @@ export default class SwordHero {
      */
     setOnTakeDamage(f) {
         this.onTakeDamage = f
-    }
-
-    takeDamage(damage = 1) {
-        this.damage += damage
-        this.onTakeDamage()
-        if (this.damage >= this.health) { this.die() }
-        return this
     }
 
     recoil() {
@@ -660,12 +675,33 @@ export default class SwordHero {
         this.bounce()
     }
 
+
     /**
-     * Chequea y ejecuta condicion de muerte contra un obstaculo peligroso
-     * @param {Phaser.Tilemaps.Tile} tile 
+     * @param {Phaser.Tilemaps.TilemapLayer} layer
      */
-    checkHazard(tile) {
-        return tile.properties.deadly
+    handleSpikes(layer) {
+        this.scene.physics.add.overlap(
+            layer,
+            this.sprite,
+            () => this.getHit(),
+            (_w, tile) => {
+                return tile.properties.deadly
+                    && tile.properties.hazard == 'spike'
+                    && this.getOverlapRectangle(tile).height > (tile.height / 2)
+            },
+            this
+        )
+    }
+
+    /**
+     * Calculates overlapping rectangle between hero sprite and another tile (for example, SPIKES)
+     * @param {Phaser.Tilemaps.Tile} os Tile to check for overlapping rectangle for
+     */
+    getOverlapRectangle(os) {
+        return Phaser.Geom.Intersects.GetRectangleIntersection(
+            Geometry.rectangle(this.x, this.y, this.width, this.height),
+            Geometry.rectangle(os.getCenterX(), os.getCenterY(), os.width, os.height)
+        )
     }
 
     tryToSpin() {

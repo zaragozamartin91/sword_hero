@@ -16,8 +16,7 @@ const GRAVITY_VAL = 1200
 
 document.onreadystatechange = function () {
     console.log("onreadystatechange CALLED!")
-    const params = new URLSearchParams(window.location.search)
-    const profile = params.get("profile") || "production"
+    const profile = BaseScene.getQueryParam('profile', 'production')
     BaseScene.setProfile(profile)
     if (document.readyState === 'complete') {
         document.body.style.overflow = 'hidden' // hiding the scroll bar

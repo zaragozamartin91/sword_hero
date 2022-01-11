@@ -65,6 +65,16 @@ export default class BaseScene extends Phaser.Scene {
         return worldWidth < 760 || worldHeight < 760
     }
 
+    /**
+     * @param {string} paramName Query param name
+     * @param {any} defaultValue Default value to be assigned
+     */
+    static getQueryParam(paramName, defaultValue = undefined) {
+        const queryParams = new URLSearchParams(window.location.search)
+        const queryParam = queryParams.get(paramName)
+        return queryParam == null ? defaultValue : queryParam
+    }
+
     get worldDims() {
         return BaseScene.getWorldDimensions()
     }
