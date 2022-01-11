@@ -31,7 +31,9 @@ const SPIN_ANGLE = 360 * 2
 const EMPTY_LAMBDA = () => { }
 
 const STAND_ATTACK_INFO = { animKey: 'unsheath_and_attack', duration: 400 }
-const TAKE_DAMAGE_INFO = { animKey: 'take_damage', duration: 300, speedX: 250, speedY: 300 }
+const TAKE_DAMAGE_INFO = {
+    animKey: 'take_damage', duration: 300, speedX: 250, speedY: 300, iframesDuration: 1500
+}
 const FLOAT_ATTACK_INFO = { animKey: 'float_attack', duration: 300 }
 const BODY_SCALING_FACTOR = { w: 0.3, h: 0.8 }
 
@@ -107,6 +109,7 @@ export default class SwordHero {
     /** @type{number} Hero's current damage */                      damage = 0
     /** @type{boolean} Hero is currently taking damage */           takingDamage = false
     /** @type{function} Take damage callback */                     onTakeDamage = EMPTY_LAMBDA
+    /** @type{boolean} Signals wether iframes are active */         iframes = false
 
     /** @type{boolean} Determina si el personaje esta bloqueado para hacer movimientos */
     motionBlocked = false
@@ -199,6 +202,9 @@ export default class SwordHero {
         /* Inicializacion del hitbox de golpe */
         this.standHitbox = new StandAttackHitbox(scene, this)
         this.floatHitbox = new FloatAttackHitbox(scene, this)
+
+        this.takingDamage = false
+        this.iframes = false
     }
 
     get body() { return this.sprite.body }
@@ -493,11 +499,17 @@ export default class SwordHero {
      * @param {number} damage Damage to receive
      */
     getHit(damage = 1) {
-        if (this.takingDamage) { return } // cannot take damage WHILE taking damage
+        // cannot take damage WHILE taking damage or when on iframes
+        if (this.takingDamage || this.iframes) { return }
         this.takeDamage(damage)
         this.recoil()
     }
 
+    /**
+     * Takes damage. Triggers onTakeDamage callback. Triggers death logic on max damage taken
+     * @param {number} damage Damage taken
+     * @returns This
+     */
     takeDamage(damage = 1) {
         this.damage += damage
         this.onTakeDamage()
@@ -514,20 +526,28 @@ export default class SwordHero {
     }
 
     recoil() {
-        const { speedX, speedY, duration } = TAKE_DAMAGE_INFO
+        const { speedX, speedY, duration, animKey, iframesDuration } = TAKE_DAMAGE_INFO
         const velX = this.facingRight ? (-speedX) : speedX
         const velY = -speedY
-        this.playAnim(TAKE_DAMAGE_INFO.animKey, true)
+        this.playAnim(animKey, true)
         this.setVelocityX(velX)
         this.setVelocityY(velY)
         this.setAccelerationX(0)
         this.setAccelerationY(0)
-        this.takingDamage = true
+
+        this.iframes = true
         this.sprite.setTint(0xff0000)
+        this.takingDamage = true
         this.scene.time.delayedCall(duration, () => {
             this.takingDamage = false
             this.sprite.clearTint()
+            this.sprite.setAlpha(0.5)
         })
+        this.scene.time.delayedCall(iframesDuration, () => {
+            this.iframes = false
+            this.sprite.setAlpha(1)
+        })
+
         return this
     }
 
