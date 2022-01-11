@@ -22,3 +22,5 @@ Para correr el juego en modo debug, lanzar el juego desde `localhost:8080/sword_
 ## Desarrollo
 
 Correr `npm run compile_watch` para iniciar una configuracion de webpack que constantemente monitoree cambios en el codebase y recompile automaticamente.
+
+_Nota: Presionar CTRL+SHIFT+R para impactar cambios en el browser luego de modificar el codigo fuente_

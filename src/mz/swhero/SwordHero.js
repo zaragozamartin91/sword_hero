@@ -1,6 +1,7 @@
 // @ts-check
 
 import AssetLoader from './AssetLoader'
+import Geometry from './Geometry'
 import Hitbox from './Hitbox'
 import InputManager from './InputManager'
 
@@ -674,17 +675,22 @@ export default class SwordHero {
         this.bounce()
     }
 
+
     /**
-     * Chequea y ejecuta condicion de muerte contra un obstaculo peligroso
-     * @param {Phaser.Tilemaps.Tile} tile 
+     * @param {Phaser.Tilemaps.TilemapLayer} layer
      */
-    checkHazard(tile) {
-        if (tile.properties.deadly) {
-            const overlapRectangle = this.getOverlapRectangle(tile)
-            return overlapRectangle.height > (tile.height / 2)
-        } else {
-            return false
-        }
+    handleSpikes(layer) {
+        this.scene.physics.add.overlap(
+            layer,
+            this.sprite,
+            () => this.getHit(),
+            (_w, tile) => {
+                return tile.properties.deadly
+                    && tile.properties.hazard == 'spike'
+                    && this.getOverlapRectangle(tile).height > (tile.height / 2)
+            },
+            this
+        )
     }
 
     /**
@@ -692,19 +698,10 @@ export default class SwordHero {
      * @param {Phaser.Tilemaps.Tile} os Tile to check for overlapping rectangle for
      */
     getOverlapRectangle(os) {
-        const heroRect = { cx: this.x, cy: this.y, w: this.width, h: this.height }
-        const osRect = { cx: os.getCenterX(), cy: os.getCenterY(), w: os.width, h: os.height }
         return Phaser.Geom.Intersects.GetRectangleIntersection(
-            this.toRectangle(heroRect), this.toRectangle(osRect))
-    }
-
-    /**
-     * Creates a rectangle using sprite coordinates
-     * @param {{cx:number,cy:number,w:number,h:number}} spriteCoordinates  
-     * @returns {Phaser.Geom.Rectangle} Phaser rectangle
-     */
-    toRectangle({ cx, cy, w, h }) {
-        return new Phaser.Geom.Rectangle(cx - w / 2, cy - h / 2, w, h)
+            Geometry.rectangle(this.x, this.y, this.width, this.height),
+            Geometry.rectangle(os.getCenterX(), os.getCenterY(), os.width, os.height)
+        )
     }
 
     tryToSpin() {
