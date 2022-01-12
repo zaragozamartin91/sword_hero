@@ -58,5 +58,19 @@ export default class Hitbox {
         this.setPosition(x, y)
         this.enabled = true
     }
+
+    /**
+     * Sets a callback when this hitbox overlaps with a game object AND THE HITBOX IS ENABLED
+     * @param {Phaser.GameObjects.GameObject} object Game object
+     * @param {() => void} callback Overlap callback
+     */
+    onOverlap(object, callback) {
+        this.scene.physics.add.overlap(
+            this.sprite,
+            object,
+            () => callback(),
+            () => { return this.enabled }
+        )
+    }
 }
 

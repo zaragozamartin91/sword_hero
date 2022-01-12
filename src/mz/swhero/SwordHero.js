@@ -382,8 +382,8 @@ export default class SwordHero {
      * @param {function} hitCallback Funcion callback al golpear
      */
     handleAttackingEnemy(enemySprite, hitCallback) {
-        this.scene.physics.add.overlap(this.standHitbox.sprite, enemySprite, () => hitCallback())
-        this.scene.physics.add.overlap(this.floatHitbox.sprite, enemySprite, () => hitCallback())
+        this.standHitbox.onOverlap(enemySprite, () => hitCallback())
+        this.floatHitbox.onOverlap(enemySprite, () => hitCallback())
     }
 
     /**

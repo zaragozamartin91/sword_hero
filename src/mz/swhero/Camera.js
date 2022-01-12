@@ -79,6 +79,16 @@ export default class Camera {
         this.mainCamera.fadeOut(duration, r, g, b)
     }
 
+    /**
+     * Fades out camera and triggers callback
+     * @param {() => void} callback Function to call after fade out
+     */
+    fadeOutAndThen(duration = 1000, colors = { r: 0, g: 0, b: 0 }, callback) {
+        const { r, g, b } = colors
+        this.mainCamera.fadeOut(duration, r, g, b)
+        this.scene.time.delayedCall(duration, () => callback())
+    }
+
     fadeIn(duration = 1000, colors = { r: 0, g: 0, b: 0 }) {
         const { r, g, b } = colors
         this.mainCamera.fadeIn(duration, r, g, b)
