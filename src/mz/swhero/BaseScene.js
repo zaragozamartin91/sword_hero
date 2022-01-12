@@ -112,10 +112,17 @@ export default class BaseScene extends Phaser.Scene {
     }
 
     /**
+     * Launches stage complete scene
+     */
+    completeStage(sceneData = {}) {
+        this.startAnotherScene('StageCompleteScene', sceneData)
+    }
+
+    /**
      * Shuts down current scene and starts next scene
      * @param {string} sceneKey Scene id
      */
-    startAnotherScene(sceneKey) {
-        this.scene.start(sceneKey)
+    startAnotherScene(sceneKey, sceneData = {}) {
+        this.scene.start(sceneKey, sceneData)
     }
 }

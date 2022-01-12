@@ -10,13 +10,14 @@ import StaticEnemy from './StaticEnemy'
 import Healthbar from './Healthbar'
 import AssetLoader from './AssetLoader'
 import InteractiveScene from './InteractiveScene'
+import Hitbox from './Hitbox'
 
-
-// const PLAYER_START_POS = { x: 667, y: 2200 }
 const PLAYER_START_POS = { x: 150, y: 1100 }
+// const PLAYER_START_POS = { x: 6520, y: 900 }
 const ABYSS_LIMIT = 1800
 const VOID_DEBUG_TEXT = { init: function () { }, setText: function () { } }
 const CAMERA_CONFIG = { y: 1250, lowerBound: 1275 }
+const FADEOUT_CONFIG = { duration: 1000, color: { r: 0, g: 0, b: 0 } }
 
 
 export default class Scene01 extends InteractiveScene {
@@ -80,6 +81,8 @@ export default class Scene01 extends InteractiveScene {
                 tweencfg: { props: { x: 4200 }, duration: 1000, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
             }
         ]
+
+        this.flagpole = new Hitbox(this)
     }
 
 
@@ -156,8 +159,7 @@ export default class Scene01 extends InteractiveScene {
         this.swordHero.setOnDeath(() => {
             this.explosion.explode(this.swordHero.x, this.swordHero.y)
             this.physics.pause()
-            this.mainCamera.fadeOut()
-            this.time.delayedCall(1000, () => {
+            this.mainCamera.fadeOutAndThen(FADEOUT_CONFIG.duration, FADEOUT_CONFIG.color, () => {
                 this.swordHero.resurrect()
                 this.scene.restart()
             })
@@ -253,6 +255,16 @@ export default class Scene01 extends InteractiveScene {
 
         // resetting score
         this.score = 0
+
+        // init flagpole to complete stage
+        this.flagpole.init({ x: 0, y: 0, w: 100, h: 130 })
+        this.flagpole.enable(6700, 975)
+        this.flagpole.onOverlap(this.swordHero.sprite, () => {
+            this.flagpole.disable()
+            const { duration, color } = FADEOUT_CONFIG
+            const sceneData = { score: this.score }
+            this.mainCamera.fadeOutAndThen(duration, color, () => this.completeStage(sceneData))
+        })
     }
 
 
