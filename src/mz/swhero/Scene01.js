@@ -11,14 +11,13 @@ import Healthbar from './Healthbar'
 import AssetLoader from './AssetLoader'
 import InteractiveScene from './InteractiveScene'
 import Hitbox from './Hitbox'
+import CollectableGroup from './CollectableGroup'
 
-const PLAYER_START_POS = { x: 150, y: 1100 }
-// const PLAYER_START_POS = { x: 6520, y: 900 }
+const PLAYER_START_POS = { x: 150, y: 1200 }
 const ABYSS_LIMIT = 1800
 const VOID_DEBUG_TEXT = { init: function () { }, setText: function () { } }
 const CAMERA_CONFIG = { y: 1250, lowerBound: 1275 }
 const FADEOUT_CONFIG = { duration: 1000, color: { r: 0, g: 0, b: 0 } }
-
 
 export default class Scene01 extends InteractiveScene {
     /**
@@ -61,7 +60,7 @@ export default class Scene01 extends InteractiveScene {
 
         this.crabs = [
             {
-                pos: { x: 1450, y: 1000 }, enemy: StaticEnemy.newCrab(this),
+                pos: { x: 1450, y: 1200 }, enemy: StaticEnemy.newCrab(this),
                 // x signals END X position
                 tweencfg: { props: { x: 1700 }, duration: 1500, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
             },
@@ -79,10 +78,26 @@ export default class Scene01 extends InteractiveScene {
                 pos: { x: 3950, y: 1200 }, enemy: StaticEnemy.newCrab(this),
                 // x signals END X position
                 tweencfg: { props: { x: 4200 }, duration: 1000, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
+            },
+            {
+                pos: { x: 700, y: 800 }, enemy: StaticEnemy.newCrab(this),
+                // x signals END X position
+                tweencfg: { props: { x: 1025 }, duration: 1000, yoyo: true, repeat: -1, flipX: true, hold: 500, repeatDelay: 500 }
             }
         ]
 
         this.flagpole = new Hitbox(this)
+
+        // configuring collectable stars
+        this.stars = new CollectableGroup(this)
+        this.starLocations = [
+            { x: 60, y: 1000 }, { x: 1485, y: 1300 }, { x: 1275, y: 1000 },
+            { x: 780, y: 800 }, { x: 2975, y: 1200 }, { x: 3975, y: 1200 },
+            { x: 5860, y: 1200 }
+        ]
+
+        // computing possible max score
+        this.maxScore = 10 * (this.starLocations.length + this.crabs.length + this.wasps.length)
     }
 
 
@@ -140,8 +155,6 @@ export default class Scene01 extends InteractiveScene {
 
         const worldLayer = this.tileset.getLayer('world')
         const deathLayer = this.tileset.getLayer('death')
-        window.worldLayer = worldLayer
-        window.deathLayer = deathLayer
 
         this.bombs = this.physics.add.group();
 
@@ -170,13 +183,8 @@ export default class Scene01 extends InteractiveScene {
 
         //Let's drop a sprinkling of stars into the scene and allow the player to collect them ----------------------------------------------------
         //Groups are able to take configuration objects to aid in their setup
-        this.stars = this.physics.add.group({
-            key: 'star', //texture key to be the star image by default
-            repeat: 6, //Because it creates 1 child automatically, repeating 11 times means we'll get 12 in total
-            setXY: { x: 90, y: PLAYER_START_POS.y, stepX: 70 } //this is used to set the position of the 12 children the Group creates. Each child will be placed starting at x: 12, y: 0 and with an x step of 70
-        });
-
-        this.stars.children.iterate(child => { child.setBounceY(this.numberBetween(0.4, 0.8)) })
+        this.stars.init('star').addItems(this.starLocations)
+        this.stars.iterate(child => { child.setBounceY(this.numberBetween(0.4, 0.8)) })
 
         /* DETECCION DE COLISION ----------------------------------------------------------------------------------------------------------------- */
 
@@ -187,19 +195,16 @@ export default class Scene01 extends InteractiveScene {
         // we add collider between sword hero and world layer
         this.swordHero.handlePlatforms(worldLayer)
 
-        this.physics.add.collider(this.stars, worldLayer)
+        this.stars.collideWith(worldLayer)
 
         //This tells Phaser to check for an overlap between the player and any star in the stars Group
-        this.physics.add.overlap(this.swordHero.sprite, this.stars, (_, star) => {
-            star.disableBody(true, true)
-
-            this.score += 10
-            this.scoreText.setText('Score: ' + this.score)
+        this.stars.onCollect(this.swordHero.sprite, star => {
+            this.updateScore(10)
 
             //We use a Group method called countActive to see how many this.stars are left alive
-            if (this.stars.countActive(true) === 0) {
+            if (this.stars.countActive() === 0) {
                 //enableBody(reset, x, y, enableGameObject, showGameObject)
-                this.stars.children.iterate(child => child.enableBody(true, child.x, PLAYER_START_POS.y, true, true))
+                this.stars.iterate(child => child.enableBody(true, child.x, PLAYER_START_POS.y, true, true))
                 let x = this.numberBetween(PLAYER_START_POS.x, PLAYER_START_POS.x + 300)
 
                 let bomb = this.bombs.create(x, PLAYER_START_POS.y, 'bomb')
@@ -221,7 +226,10 @@ export default class Scene01 extends InteractiveScene {
             this.swordHero.handleEnemyHit(wasp.sprite)
 
             if (w.tweencfg) { this.tweens.add({ ...w.tweencfg, targets: wasp }) }
-            wasp.setOnDeath(() => this.explosion.explode(wasp.x, wasp.y, 3, 3))
+            wasp.setOnDeath(() => {
+                this.explosion.explode(wasp.x, wasp.y, 3, 3)
+                this.updateScore(10)
+            })
             this.swordHero.handleAttackingEnemy(wasp.sprite, wasp.die.bind(wasp))
         })
 
@@ -233,7 +241,10 @@ export default class Scene01 extends InteractiveScene {
             this.swordHero.handleEnemyHit(crab.sprite)
 
             if (c.tweencfg) { this.tweens.add({ ...c.tweencfg, targets: crab }) }
-            crab.setOnDeath(() => this.explosion.explode(crab.x, crab.y, 3, 3))
+            crab.setOnDeath(() => {
+                this.explosion.explode(crab.x, crab.y, 3, 3)
+                this.updateScore(10)
+            })
             this.swordHero.handleAttackingEnemy(crab.sprite, crab.die.bind(crab))
         })
 
@@ -262,7 +273,7 @@ export default class Scene01 extends InteractiveScene {
         this.flagpole.onOverlap(this.swordHero.sprite, () => {
             this.flagpole.disable()
             const { duration, color } = FADEOUT_CONFIG
-            const sceneData = { score: this.score }
+            const sceneData = { score: this.score, maxScore: this.maxScore }
             this.mainCamera.fadeOutAndThen(duration, color, () => this.completeStage(sceneData))
         })
     }
@@ -290,5 +301,10 @@ vx: ${Math.round(this.swordHero.velocity.x)} ; vy: ${Math.round(this.swordHero.v
 blockedDown: ${this.swordHero.blockedDown()}
 canSpin: ${this.swordHero.canSpin}`)
         }
+    }
+
+    updateScore(value = 10) {
+        this.score = this.score + value
+        this.scoreText.setText('Score: ' + this.score)
     }
 }

@@ -10,7 +10,7 @@ export default class StageCompleteScene extends BaseScene {
     }
 
     /**
-     * @param {{ score: number; }} [data] Stage completion information
+     * @param {{ score: number, maxScore: number }} [data] Stage completion information
      */
     create(data) {
         console.log("CREATE")
@@ -25,9 +25,17 @@ export default class StageCompleteScene extends BaseScene {
 
         // add stage completion % info
 
+        const {score, maxScore} = data
+
         const scoreText = new GameText(this)
-        scoreText.init(0, 0, `Total Score: ${data.score}`, { fontSize: '32px', fill: '#fff', strokeThickness: 1 })
+        scoreText.init(0, 0, `Total Score: ${score}`, { fontSize: '32px', fill: '#fff', strokeThickness: 1 })
         const scoreTextPos = { x: titlePos.x, y: titlePos.y + title.height }
         scoreText.setPosition(scoreTextPos.x, scoreTextPos.y)
+
+        const perc = Math.round(100 * score / maxScore)
+        const completionText = new GameText(this)
+        completionText.init(0, 0, `Completion %: ${perc}`, { fontSize: '32px', fill: '#fff', strokeThickness: 1 })
+        const completionTextPos = { x: scoreTextPos.x, y: scoreTextPos.y + scoreText.height }
+        completionText.setPosition(completionTextPos.x, completionTextPos.y)
     }
 }
