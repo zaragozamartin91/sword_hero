@@ -1,4 +1,4 @@
-var staticCacheName = "swordHero-v1";
+var staticCacheName = "swordHero-v2";
 
 self.addEventListener("install", function (e) {
     console.log('Service worker INSTALL event running')
