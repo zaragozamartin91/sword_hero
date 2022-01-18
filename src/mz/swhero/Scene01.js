@@ -1,13 +1,11 @@
 // @ts-check
 
 import Background from './Background'
-import GameText from './GameText'
 import Explosion from './Explosion'
 import Tileset from './Tileset'
 import SwordHero from './SwordHero'
 import Camera from './Camera'
 import StaticEnemy from './StaticEnemy'
-import Healthbar from './Healthbar'
 import AssetLoader from './AssetLoader'
 import InteractiveScene from './InteractiveScene'
 import Hitbox from './Hitbox'
@@ -15,7 +13,6 @@ import CollectableGroup from './CollectableGroup'
 
 const PLAYER_START_POS = { x: 150, y: 1200 }
 const ABYSS_LIMIT = 1800
-const VOID_DEBUG_TEXT = { init: function () { }, setText: function () { } }
 const CAMERA_CONFIG = { y: 1250, lowerBound: 1275 }
 const FADEOUT_CONFIG = { duration: 1000, color: { r: 0, g: 0, b: 0 } }
 
@@ -29,11 +26,6 @@ export default class Scene01 extends InteractiveScene {
         this.swordHero = new SwordHero(this) // new sword hero object
         window.swordHero = this.swordHero
         this.explosion = new Explosion(this) // explosion
-
-        this.score = 0
-        this.scoreText = new GameText(this)
-        this.healthbar = new Healthbar(this)
-        this.debugText = Scene01.devProfileEnabled() ? new GameText(this) : VOID_DEBUG_TEXT
 
         this.bg = new Background(this)
 
@@ -134,9 +126,6 @@ export default class Scene01 extends InteractiveScene {
         console.log("CREATE")
         super.create()
 
-        this.scoreText.init(0, 0, 'Score: 0')
-        this.healthbar.init(0, 32)
-        this.debugText.init(0, 64, '')
         const wd = Scene01.getWorldDimensions()
         this.bg.init(wd.half_worldWidth, wd.half_worldHeight, wd.worldWidth, wd.worldHeight)
 
@@ -167,7 +156,7 @@ export default class Scene01 extends InteractiveScene {
 
         // loading sword hero ===================================================================================================
         this.swordHero.init(PLAYER_START_POS.x, PLAYER_START_POS.y, { health: 3 })
-        this.healthbar.setMaxHealth(this.swordHero.health).update(0)
+        this.resetHealthBar(this.swordHero.health)
         this.swordHero.setInputManager(this.inputManager)
         this.swordHero.setOnDeath(() => {
             this.explosion.explode(this.swordHero.x, this.swordHero.y)
@@ -177,9 +166,7 @@ export default class Scene01 extends InteractiveScene {
                 this.scene.restart()
             })
         })
-        this.swordHero.setOnTakeDamage(() => {
-            this.healthbar.update(this.swordHero.damage)
-        })
+        this.swordHero.setOnTakeDamage(() => this.updateHealthBar(this.swordHero.damage))
 
         //Let's drop a sprinkling of stars into the scene and allow the player to collect them ----------------------------------------------------
         //Groups are able to take configuration objects to aid in their setup
@@ -199,7 +186,7 @@ export default class Scene01 extends InteractiveScene {
 
         //This tells Phaser to check for an overlap between the player and any star in the stars Group
         this.stars.onCollect(this.swordHero.sprite, star => {
-            this.updateScore(10)
+            this.bumpScore(10)
 
             //We use a Group method called countActive to see how many this.stars are left alive
             if (this.stars.countActive() === 0) {
@@ -228,7 +215,7 @@ export default class Scene01 extends InteractiveScene {
             if (w.tweencfg) { this.tweens.add({ ...w.tweencfg, targets: wasp }) }
             wasp.setOnDeath(() => {
                 this.explosion.explode(wasp.x, wasp.y, 3, 3)
-                this.updateScore(10)
+                this.bumpScore(10)
             })
             this.swordHero.handleAttackingEnemy(wasp.sprite, wasp.die.bind(wasp))
         })
@@ -243,7 +230,7 @@ export default class Scene01 extends InteractiveScene {
             if (c.tweencfg) { this.tweens.add({ ...c.tweencfg, targets: crab }) }
             crab.setOnDeath(() => {
                 this.explosion.explode(crab.x, crab.y, 3, 3)
-                this.updateScore(10)
+                this.bumpScore(10)
             })
             this.swordHero.handleAttackingEnemy(crab.sprite, crab.die.bind(crab))
         })
@@ -263,9 +250,6 @@ export default class Scene01 extends InteractiveScene {
             followVertical: cameraFollowVertical
         }).withLowerBound(CAMERA_CONFIG.lowerBound)
         this.mainCamera.fadeIn() // fade in at start of scene
-
-        // resetting score
-        this.score = 0
 
         // init flagpole to complete stage
         this.flagpole.init({ x: 0, y: 0, w: 100, h: 130 })
@@ -294,17 +278,12 @@ export default class Scene01 extends InteractiveScene {
 
 
         if (Scene01.devProfileEnabled()) {
-            this.debugText.setText(`X: ${Math.round(this.swordHero.x)} ; Y: ${Math.round(this.swordHero.y)}, 
+            this.setDebugText(`X: ${Math.round(this.swordHero.x)} ; Y: ${Math.round(this.swordHero.y)}, 
 p1x: ${Math.round(this.input.pointer1.x)} ; p2x: ${Math.round(this.input.pointer2.x)}
 acx: ${Math.round(this.swordHero.body.acceleration.x)} ; acy: ${Math.round(this.swordHero.body.acceleration.y)},
 vx: ${Math.round(this.swordHero.velocity.x)} ; vy: ${Math.round(this.swordHero.velocity.y)},
 blockedDown: ${this.swordHero.blockedDown()}
 canSpin: ${this.swordHero.canSpin}`)
         }
-    }
-
-    updateScore(value = 10) {
-        this.score = this.score + value
-        this.scoreText.setText('Score: ' + this.score)
     }
 }
