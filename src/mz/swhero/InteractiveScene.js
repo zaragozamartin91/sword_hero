@@ -5,6 +5,9 @@ import AssetLoader from './AssetLoader'
 import BaseScene from './BaseScene'
 import GameText from './GameText'
 import Healthbar from './Healthbar'
+import SwordHero from './SwordHero'
+
+const TEMP = { seconds: 0, minutes: 0 }
 
 /**
  * Defines a scene where the player may control the main character sprite
@@ -14,10 +17,12 @@ export default class InteractiveScene extends BaseScene {
     /** @type{number} Player's score */                 score
     /** @type{GameText} Score text display */           scoreText
     /** @type{GameText} Debug text display */           debugText
+    /** @type{GameText} Stage clock text */             clockText
     /** @type{Healthbar} Player's health bar */         healthbar
+    /** @type{SwordHero} Hero character */              hero
 
     /**
-     * Creates an interactive scene
+     * Creates an interactive scenes
      * @param {string} sceneName Scene key/name
      */
     constructor(sceneName) {
@@ -27,7 +32,9 @@ export default class InteractiveScene extends BaseScene {
         this.score = 0
         this.scoreText = new GameText(this)
         this.healthbar = new Healthbar(this)
+        this.clockText = new GameText(this)
         this.debugText = new GameText(this)
+        this.hero = new SwordHero(this) // new sword hero object
     }
 
     preload() {
@@ -46,10 +53,12 @@ export default class InteractiveScene extends BaseScene {
 
         this.scoreText.init(0, 0, 'Score: 0')
         this.healthbar.init(0, 32)
-        this.debugText.init(0, 64, '')
+        this.clockText.init(0, 64, 'Time: 00:00')
+        this.debugText.init(0, 96, '')
 
         // resetting score
         this.score = 0
+        this.startTime = this.time.now
     }
 
     /**
@@ -90,5 +99,35 @@ export default class InteractiveScene extends BaseScene {
      */
     updateHealthBar(accDamage) {
         this.healthbar.update(accDamage)
+    }
+
+    /**
+     * @param {number} time The current time. Either a High Resolution Timer value if it comes from Request Animation Frame, or Date.now if using SetTimeout.
+     * @param {number} [_delta] The delta time in ms since the last frame. This is a smoothed and capped value based on the FPS rate.
+     */
+    update(time, _delta) {
+        this.updateClockText(time)
+        this.updateDebugText()
+    }
+
+    /**
+     * @param {number} time Current time in milliseconds
+     */
+     updateClockText(time) {
+        TEMP.seconds = Math.round((time - this.startTime) / 1000) // round seconds
+        TEMP.minutes = Math.floor(TEMP.seconds / 60) // compute minutes
+        TEMP.seconds = TEMP.seconds - (TEMP.minutes * 60) // reduce seconds
+        this.clockText.setText(`Time: ${TEMP.minutes.toString().padStart(2, '0')}:${TEMP.seconds.toString().padStart(2, '0')}`)
+    }
+
+    updateDebugText() {
+        if (InteractiveScene.devProfileEnabled()) {
+            this.setDebugText(`X: ${Math.round(this.hero.x)} ; Y: ${Math.round(this.hero.y)}, 
+p1x: ${Math.round(this.input.pointer1.x)} ; p2x: ${Math.round(this.input.pointer2.x)}
+acx: ${Math.round(this.hero.body.acceleration.x)} ; acy: ${Math.round(this.hero.body.acceleration.y)},
+vx: ${Math.round(this.hero.velocity.x)} ; vy: ${Math.round(this.hero.velocity.y)},
+blockedDown: ${this.hero.blockedDown()}
+canSpin: ${this.hero.canSpin}`)
+        }
     }
 }

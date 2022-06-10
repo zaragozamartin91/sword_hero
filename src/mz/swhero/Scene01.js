@@ -3,7 +3,6 @@
 import Background from './Background'
 import Explosion from './Explosion'
 import Tileset from './Tileset'
-import SwordHero from './SwordHero'
 import Camera from './Camera'
 import StaticEnemy from './StaticEnemy'
 import AssetLoader from './AssetLoader'
@@ -23,8 +22,6 @@ export default class Scene01 extends InteractiveScene {
     constructor() {
         super('Scene01')
 
-        this.swordHero = new SwordHero(this) // new sword hero object
-        window.swordHero = this.swordHero
         this.explosion = new Explosion(this) // explosion
 
         this.bg = new Background(this)
@@ -94,7 +91,6 @@ export default class Scene01 extends InteractiveScene {
 
 
     preload() {
-        console.log("PRELOAD")
         super.preload()
 
         AssetLoader.loadFor(this, 'Items', () => {
@@ -123,7 +119,6 @@ export default class Scene01 extends InteractiveScene {
     }
 
     create() {
-        console.log("CREATE")
         super.create()
 
         const wd = Scene01.getWorldDimensions()
@@ -155,18 +150,18 @@ export default class Scene01 extends InteractiveScene {
 
 
         // loading sword hero ===================================================================================================
-        this.swordHero.init(PLAYER_START_POS.x, PLAYER_START_POS.y, { health: 3 })
-        this.resetHealthBar(this.swordHero.health)
-        this.swordHero.setInputManager(this.inputManager)
-        this.swordHero.setOnDeath(() => {
-            this.explosion.explode(this.swordHero.x, this.swordHero.y)
+        this.hero.init(PLAYER_START_POS.x, PLAYER_START_POS.y, { health: 3 })
+        this.resetHealthBar(this.hero.health)
+        this.hero.setInputManager(this.inputManager)
+        this.hero.setOnDeath(() => {
+            this.explosion.explode(this.hero.x, this.hero.y)
             this.physics.pause()
             this.mainCamera.fadeOutAndThen(FADEOUT_CONFIG.duration, FADEOUT_CONFIG.color, () => {
-                this.swordHero.resurrect()
+                this.hero.resurrect()
                 this.scene.restart()
             })
         })
-        this.swordHero.setOnTakeDamage(() => this.updateHealthBar(this.swordHero.damage))
+        this.hero.setOnTakeDamage(() => this.updateHealthBar(this.hero.damage))
 
         //Let's drop a sprinkling of stars into the scene and allow the player to collect them ----------------------------------------------------
         //Groups are able to take configuration objects to aid in their setup
@@ -180,12 +175,12 @@ export default class Scene01 extends InteractiveScene {
         If that occurs it can then optionally invoke your own callback, but for the sake of just colliding with platforms we don't require that */
 
         // we add collider between sword hero and world layer
-        this.swordHero.handlePlatforms(worldLayer)
+        this.hero.handlePlatforms(worldLayer)
 
         this.stars.collideWith(worldLayer)
 
         //This tells Phaser to check for an overlap between the player and any star in the stars Group
-        this.stars.onCollect(this.swordHero.sprite, star => {
+        this.stars.onCollect(this.hero.sprite, star => {
             this.bumpScore(10)
 
             //We use a Group method called countActive to see how many this.stars are left alive
@@ -203,21 +198,21 @@ export default class Scene01 extends InteractiveScene {
 
         this.physics.add.collider(this.bombs, worldLayer)
 
-        this.physics.add.collider(this.swordHero.sprite, this.bombs, (p, _) => {
-            this.swordHero.die()
+        this.physics.add.collider(this.hero.sprite, this.bombs, (p, _) => {
+            this.hero.die()
         })
 
         this.wasps.forEach(w => {
             const wasp = w.enemy
 
-            this.swordHero.handleEnemyHit(wasp.sprite)
+            this.hero.handleEnemyHit(wasp.sprite)
 
             if (w.tweencfg) { this.tweens.add({ ...w.tweencfg, targets: wasp }) }
             wasp.setOnDeath(() => {
                 this.explosion.explode(wasp.x, wasp.y, 3, 3)
                 this.bumpScore(10)
             })
-            this.swordHero.handleAttackingEnemy(wasp.sprite, wasp.die.bind(wasp))
+            this.hero.handleAttackingEnemy(wasp.sprite, wasp.die.bind(wasp))
         })
 
         this.crabs.forEach(c => {
@@ -225,26 +220,26 @@ export default class Scene01 extends InteractiveScene {
             // disable gravity on crab enemy upon collision to optimise calculations
             this.physics.add.collider(crab.sprite, worldLayer, () => crab.sprite.body.setAllowGravity(false))
 
-            this.swordHero.handleEnemyHit(crab.sprite)
+            this.hero.handleEnemyHit(crab.sprite)
 
             if (c.tweencfg) { this.tweens.add({ ...c.tweencfg, targets: crab }) }
             crab.setOnDeath(() => {
                 this.explosion.explode(crab.x, crab.y, 3, 3)
                 this.bumpScore(10)
             })
-            this.swordHero.handleAttackingEnemy(crab.sprite, crab.die.bind(crab))
+            this.hero.handleAttackingEnemy(crab.sprite, crab.die.bind(crab))
         })
 
         /* Si el jugador toca un objeto de la capa 'death' este muere */
-        this.swordHero.handleSpikes(deathLayer)
+        this.hero.handleSpikes(deathLayer)
 
         /* MANEJO DE CAMARA ----------------------------------------------------------------------------------------------------------- */
 
         // configure camera to follow player sprite
         const cameraFollowVertical = Scene01.smallScreen()
         this.mainCamera.init({
-            playerSprite: this.swordHero.sprite,
-            x: this.swordHero.sprite.x,
+            playerSprite: this.hero.sprite,
+            x: this.hero.sprite.x,
             y: CAMERA_CONFIG.y,
             followHorizontal: true,
             followVertical: cameraFollowVertical
@@ -254,7 +249,7 @@ export default class Scene01 extends InteractiveScene {
         // init flagpole to complete stage
         this.flagpole.init({ x: 0, y: 0, w: 100, h: 130 })
         this.flagpole.enable(6700, 975)
-        this.flagpole.onOverlap(this.swordHero.sprite, () => {
+        this.flagpole.onOverlap(this.hero.sprite, () => {
             this.flagpole.disable()
             const { duration, color } = FADEOUT_CONFIG
             const sceneData = { score: this.score, maxScore: this.maxScore }
@@ -263,27 +258,23 @@ export default class Scene01 extends InteractiveScene {
     }
 
 
-    update() {
-        if (this.swordHero.isAlive()) {
+    /**
+     * @param {number} time The current time. Either a High Resolution Timer value if it comes from Request Animation Frame, or Date.now if using SetTimeout.
+     * @param {number} [_delta] The delta time in ms since the last frame. This is a smoothed and capped value based on the FPS rate.
+     */
+    update(time, _delta) {
+        super.update(time)
+
+        if (this.hero.isAlive()) {
             this.mainCamera.update()
-            this.swordHero.update()
-            this.bg.update(this.swordHero.body.velocity.x, 0) // dont update background in Y axis
+            this.hero.update()
+            this.bg.update(this.hero.body.velocity.x, 0) // dont update background in Y axis
         }
 
         /* Si el jugador se cae al fondo, entonces muere y reiniciamos el juego */
-        if (this.swordHero.y > ABYSS_LIMIT) {
-            this.swordHero.setPosition(0, ABYSS_LIMIT - 100)
-            this.swordHero.die()
-        }
-
-
-        if (Scene01.devProfileEnabled()) {
-            this.setDebugText(`X: ${Math.round(this.swordHero.x)} ; Y: ${Math.round(this.swordHero.y)}, 
-p1x: ${Math.round(this.input.pointer1.x)} ; p2x: ${Math.round(this.input.pointer2.x)}
-acx: ${Math.round(this.swordHero.body.acceleration.x)} ; acy: ${Math.round(this.swordHero.body.acceleration.y)},
-vx: ${Math.round(this.swordHero.velocity.x)} ; vy: ${Math.round(this.swordHero.velocity.y)},
-blockedDown: ${this.swordHero.blockedDown()}
-canSpin: ${this.swordHero.canSpin}`)
+        if (this.hero.y > ABYSS_LIMIT) {
+            this.hero.setPosition(0, ABYSS_LIMIT - 100)
+            this.hero.die()
         }
     }
 }
