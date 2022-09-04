@@ -10,3 +10,6 @@ poc_stuff
 
 report.*.json
 **/.DS_Store
+
+# Ignoring idea files
+.idea
