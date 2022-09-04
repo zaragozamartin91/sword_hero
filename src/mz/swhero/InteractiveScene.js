@@ -6,8 +6,7 @@ import BaseScene from './BaseScene'
 import GameText from './GameText'
 import Healthbar from './Healthbar'
 import SwordHero from './SwordHero'
-
-const TEMP = { seconds: 0, minutes: 0 }
+import Stopwatch from './Stopwatch'
 
 /**
  * Defines a scene where the player may control the main character sprite
@@ -20,6 +19,7 @@ export default class InteractiveScene extends BaseScene {
     /** @type{GameText} Stage clock text */             clockText
     /** @type{Healthbar} Player's health bar */         healthbar
     /** @type{SwordHero} Hero character */              hero
+    /** @type{Stopwatch} Game stop watch */             stopwatch
 
     /**
      * Creates an interactive scenes
@@ -58,7 +58,7 @@ export default class InteractiveScene extends BaseScene {
 
         // resetting score
         this.score = 0
-        this.startTime = this.time.now
+        this.stopwatch = new Stopwatch(this.time.now)
     }
 
     /**
@@ -113,11 +113,9 @@ export default class InteractiveScene extends BaseScene {
     /**
      * @param {number} time Current time in milliseconds
      */
-     updateClockText(time) {
-        TEMP.seconds = Math.round((time - this.startTime) / 1000) // round seconds
-        TEMP.minutes = Math.floor(TEMP.seconds / 60) // compute minutes
-        TEMP.seconds = TEMP.seconds - (TEMP.minutes * 60) // reduce seconds
-        this.clockText.setText(`Time: ${TEMP.minutes.toString().padStart(2, '0')}:${TEMP.seconds.toString().padStart(2, '0')}`)
+    updateClockText(time) {
+        this.stopwatch.update(time)
+        this.clockText.setText(this.stopwatch.toString())
     }
 
     updateDebugText() {
