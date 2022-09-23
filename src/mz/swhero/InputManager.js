@@ -2,10 +2,21 @@
 
 import ActionButton from "./ActionButton"
 
-// declaring temp global vars to save memory
-const TEMP = { currIn: { dir: 'NONE', action: 'NONE' } }
 
 export default class InputManager {
+    /** @type{Phaser.Types.Input.Keyboard.CursorKeys} */    cursors
+
+    /** @type{boolean} */                                   leftPress = false
+    /** @type{boolean} */                                   rightPress = false
+    /** @type{boolean} */                                   jumpPress = false
+    /** @type{boolean} */                                   attackPress = false
+
+    /** @type{ActionButton} */                              leftButton
+    /** @type{ActionButton} */                              rightButton
+    /** @type{ActionButton} */                              aButton
+    /** @type{ActionButton} */                              bButton
+
+
     /**
      * Escena de juego
      * @param {Phaser.Scene} scene Phaser Scene
@@ -16,13 +27,6 @@ export default class InputManager {
 
     /** Obtiene el manejador del puntero tactil */
     get pointer1() { return this.scene.input.pointer1 }
-
-    /** Obtiene el manejador de teclado */
-    get cursors() {
-        //Phaser has a built-in Keyboard manager 
-        //This populates the cursors object with four properties: up, down, left, right, that are all instances of Key objects. 
-        return this.cs
-    }
 
     checkLeftPress() {
         return this.cursors.left.isDown || this.leftPress
@@ -46,6 +50,7 @@ export default class InputManager {
      * @param {number} worldHeight Alto del mundo
      */
     init(worldWidth, worldHeight) {
+        // initialize game action buttons
         this.leftButton = new ActionButton(this.scene, 'left_btn')
         this.rightButton = new ActionButton(this.scene, 'right_btn')
         this.aButton = new ActionButton(this.scene, 'a_btn')
@@ -91,26 +96,55 @@ export default class InputManager {
         //Phaser has a built-in Keyboard manager 
         //This populates the cursors object with four properties: up, down, left, right, that are all instances of Key objects. 
         console.log('Creating keyboard cursor keys')
-        this.cs = this.scene.input.keyboard.createCursorKeys()
+        this.cursors = this.scene.input.keyboard.createCursorKeys()
     }
 
     get currentInput() {
-        if (this.checkRightPress()) {
-            TEMP.currIn.dir = 'RIGHT'
-        } else if (this.checkLeftPress()) {
-            TEMP.currIn.dir = 'LEFT'
-        } else {
-            TEMP.currIn.dir = 'NONE'
-        }
+        return InputValue.parse(
+            this.checkLeftPress(),
+            this.checkRightPress(),
+            this.checkAttackPress(),
+            this.checkJumpPress()
+        )
+    }
+}
 
-        if (this.checkAttackPress()) {
-            TEMP.currIn.action = 'ATTACK'
-        } else if (this.checkJumpPress()) {
-            TEMP.currIn.action = 'JUMP'
-        } else {
-            TEMP.currIn.action = 'NONE'
-        }
+export class InputValue {
+    /** @type{string} Direction input */    dir
+    /** @type{string} Action input */       action
 
-        return TEMP.currIn
+    /**
+     * Creates input value instance
+     * @param {string} dir Direction
+     * @param {string} action Action
+     */
+    constructor(dir = 'NONE', action = 'NONE') {
+        this.dir = dir
+        this.action = action
+    }
+
+    static LEFT = 'LEFT'
+    static RIGHT = 'RIGHT'
+    static ATTACK = 'ATTACK'
+    static JUMP = 'JUMP'
+    static NONE = 'NONE'
+
+    /**
+     * Parses current input into a normalized value.
+     * @param {boolean} leftPress True if LEFT KEY is pressed
+     * @param {boolean} rightPress True if RIGHT KEY is pressed
+     * @param {boolean} attackPress True if ATTACK KEY is pressed
+     * @param {boolean} jumpPress True if JUMP KEY is pressed
+     * @returns Parsed input value.
+     */
+    static parse(leftPress, rightPress, attackPress, jumpPress) {
+        return new InputValue(
+            rightPress ? this.RIGHT : leftPress ? this.LEFT : this.NONE,
+            attackPress ? this.ATTACK : jumpPress ? this.JUMP : this.NONE
+        )
+    }
+
+    static VOID() {
+        return new InputValue('NONE', 'NONE')
     }
 }

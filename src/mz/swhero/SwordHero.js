@@ -3,7 +3,7 @@
 import AssetLoader from './AssetLoader'
 import Geometry from './Geometry'
 import Hitbox from './Hitbox'
-import InputManager from './InputManager'
+import InputManager, { InputValue } from './InputManager'
 
 const MAX_SPEED_X = 400
 const MAX_SPEED_Y = 1100
@@ -30,18 +30,16 @@ const SPIN_ANGLE = 360 * 2
 
 const EMPTY_LAMBDA = () => { }
 
+const STAND_INFO = { animKey: 'stand' }
+const WALK_LEFT_INFO = { animKey: 'left' }
+const WALK_RIGHT_INFO = { animKey: 'right' }
+const JUMP_INFO = { animKey: 'jump' }
 const STAND_ATTACK_INFO = { animKey: 'unsheath_and_attack', duration: 400 }
 const TAKE_DAMAGE_INFO = {
     animKey: 'take_damage', duration: 300, speedX: 250, speedY: 300, iframesDuration: 1500
 }
 const FLOAT_ATTACK_INFO = { animKey: 'float_attack', duration: 300 }
 const BODY_SCALING_FACTOR = { w: 0.3, h: 0.8 }
-
-// variables temporales para ahorrar memoria
-const TEMP = {
-    input: { dir: 'NONE', action: 'NONE' }, // inputManager's input
-    status: { position: 'STANDING', action: 'NONE' } // hero's position & action status
-}
 
 class HeroHitbox extends Hitbox {
     /**
@@ -95,14 +93,14 @@ class FloatAttackHitbox extends HeroHitbox {
 }
 
 export default class SwordHero {
-    /** @type{Phaser.Scene} */                                      scene = null
-    /** @type{Phaser.Types.Physics.Arcade.SpriteWithDynamicBody} */ sprite = null
+    /** @type{Phaser.Scene} */                                      scene
+    /** @type{Phaser.Types.Physics.Arcade.SpriteWithDynamicBody} */ sprite
     /** @type{boolean} Determina si el personaje esta muerto */     dead = false
     /** @type{function} Funcion a ejecutar al morir */              onDeath = EMPTY_LAMBDA
     /** @type{boolean} Controla si el personaje puede girar */      canSpin = false
     /** @type{number} El frame en el que el jugador reboto */       bounceFrame = DEFAULT_BOUNCE_FRAME
-    /** @type{StandAttackHitbox} Hitbox de ataques */               standHitbox = null
-    /** @type{FloatAttackHitbox} Hitbox de ataque aereo */          floatHitbox = null
+    /** @type{StandAttackHitbox} Hitbox de ataques */               standHitbox
+    /** @type{FloatAttackHitbox} Hitbox de ataque aereo */          floatHitbox
     /** @type{Boolean} Indica si el heroe esta girando */           spinning = false
     /** @type{Boolean} Indica si el heroe esta atacando */          attacking = false
     /** @type{number} Hero's max health */                          health = 3
@@ -110,6 +108,7 @@ export default class SwordHero {
     /** @type{boolean} Hero is currently taking damage */           takingDamage = false
     /** @type{function} Take damage callback */                     onTakeDamage = EMPTY_LAMBDA
     /** @type{boolean} Signals wether iframes are active */         iframes = false
+    /** @type{InputManager} Scene input manager */                  inputManager
 
     /** @type{boolean} Determina si el personaje esta bloqueado para hacer movimientos */
     motionBlocked = false
@@ -145,28 +144,28 @@ export default class SwordHero {
 
         AssetLoader.loadFor(scene, heroKey, () => {
             scene.anims.create({
-                key: 'left',
+                key: WALK_LEFT_INFO.animKey,
                 frames: scene.anims.generateFrameNumbers(heroKey, { start: 8, end: 13 }),
                 frameRate: 10,
                 repeat: -1
             })
 
             scene.anims.create({
-                key: 'stand',
+                key: STAND_INFO.animKey,
                 frames: scene.anims.generateFrameNumbers(heroKey, { start: 0, end: 3 }),
                 frameRate: 5,
                 repeat: -1
             })
 
             scene.anims.create({
-                key: 'right',
+                key: WALK_RIGHT_INFO.animKey,
                 frames: scene.anims.generateFrameNumbers(heroKey, { start: 8, end: 13 }),
                 frameRate: 10,
                 repeat: -1
             })
 
             scene.anims.create({
-                key: 'jump',
+                key: JUMP_INFO.animKey,
                 frames: scene.anims.generateFrameNumbers(heroKey, { start: 16, end: 23 }),
                 frameRate: 10,
                 repeat: 0
@@ -343,7 +342,7 @@ export default class SwordHero {
      */
     die() {
         this.sprite.setTint(0xff0000)
-        this.sprite.anims.play('stand')
+        this.sprite.anims.play(STAND_INFO.animKey)
         this.dead = true
 
         this.onDeath()
@@ -393,24 +392,7 @@ export default class SwordHero {
     setOnDeath(f) { this.onDeath = f }
 
     parseStatus() {
-        const heroStatus = {}
-        if (this.takingDamage) {
-            heroStatus.position = 'TAKING_DAMAGE'
-        } else if (this.blockedDown()) {
-            heroStatus.position = 'STANDING'
-        } else {
-            heroStatus.position = 'FLOATING'
-        }
-
-        if (this.attacking) {
-            heroStatus.action = 'ATTACKING'
-        } else if (this.spinning) {
-            heroStatus.action = 'SPINNING'
-        } else {
-            heroStatus.action = 'NONE'
-        }
-
-        return heroStatus
+        return HeroStatus.parseStatus(this)
     }
 
     /**
@@ -420,34 +402,35 @@ export default class SwordHero {
         this.standHitbox.update()
         this.floatHitbox.update()
 
-        TEMP.input = this.inputManager.currentInput
-        TEMP.status = this.parseStatus()
+        const currentInput = this.inputManager.currentInput
+        const currentStatus = this.parseStatus()
 
-        switch (TEMP.status.position) {
-            case 'TAKING_DAMAGE': return // movement is blocked while taking damage
-            case 'STANDING': return this.updateStading(TEMP.input, TEMP.status)
-            case 'FLOATING': return this.updateFloating(TEMP.input)
+        switch (currentStatus.position) {
+            case HeroStatus.TAKING_DAMAGE: return // movement is blocked while taking damage
+            case HeroStatus.STANDING: return this.updateStading(currentInput, currentStatus)
+            case HeroStatus.FLOATING: return this.updateFloating(currentInput)
             default: // nothing
         }
     }
 
     /**
      * Updates sword hero while standing
-     * @param {{action:string, dir:string}} input User input
-     * @param {{position:string, action:string}} status Sword hero status
+     * @param {InputValue} input User input
+     * @param {HeroStatus} status Sword hero status
      */
     updateStading(input, status) {
         // en el piso
         switch (status.action) {
-            case 'ATTACKING':
+            case HeroStatus.ATTACKING:
                 return this.isStopping() ? this.stopMovement() : this.decelerate()
+            
             default: switch (input.action) {
-                case 'ATTACK': return this.tryToStandAttack()
-                case 'JUMP': return this.jump()
+                case InputValue.ATTACK: return this.tryToStandAttack()
+                case InputValue.JUMP: return this.jump()
                 default: // no action button pressed 
                     switch (input.dir) {
-                        case 'LEFT': return this.walkLeft()
-                        case 'RIGHT': return this.walkRight()
+                        case InputValue.LEFT: return this.walkLeft()
+                        case InputValue.RIGHT: return this.walkRight()
                         default: // no direction button pressed
                             return this.isStopping() ? this.haltAndStand() : this.walkSlower()
                     }
@@ -457,17 +440,17 @@ export default class SwordHero {
 
     /**
      * Updates the sword hero while floating
-     * @param {{action:string, dir:string}} input User input
+     * @param {InputValue} input User input
      */
     updateFloating(input) {
         this.capDropSpeed()
 
         switch (input.action) {
-            case 'ATTACK': return this.tryToFloatAttack()
-            case 'JUMP': return this.tryToSpin()
+            case InputValue.ATTACK: return this.tryToFloatAttack()
+            case InputValue.JUMP: return this.tryToSpin()
             default: switch (input.dir) {
-                case 'LEFT': return this.floatLeft()
-                case 'RIGHT': return this.floatRight()
+                case InputValue.LEFT: return this.floatLeft()
+                case InputValue.RIGHT: return this.floatRight()
                 default: return this.setAccelerationX(0) // no directions pressed
             }
         }
@@ -561,14 +544,14 @@ export default class SwordHero {
     }
 
     haltAndStand() {
-        this.playAnim('stand', true)
+        this.playAnim(STAND_INFO.animKey, true)
         return this.stopMovement()
     }
 
     walkLeft() {
         this.moveLeft()
         this.flipX = true
-        return this.playAnim('left', true)
+        return this.playAnim(WALK_LEFT_INFO.animKey, true)
     }
 
     moveLeft() { this.setAccelerationX(this.goingRight() ? NEG_TRIPLE_ACCEL : NEG_ACCEL) }
@@ -578,13 +561,13 @@ export default class SwordHero {
     walkRight() {
         this.moveRight()
         this.flipX = false
-        this.playAnim('right', true)
+        this.playAnim(WALK_RIGHT_INFO.animKey, true)
     }
 
     moveRight() { this.setAccelerationX(this.goingLeft() ? TRIPLE_ACCEL : ACCEL) }
 
     walkSlower() {
-        this.playAnim(this.goingLeft() ? 'left' : 'right', true)
+        this.playAnim(this.goingLeft() ? WALK_LEFT_INFO.animKey : WALK_RIGHT_INFO.animKey, true)
         return this.decelerate()
     }
 
@@ -592,7 +575,7 @@ export default class SwordHero {
 
     jump() {
         this.setVelocityY(JUMP_POWER)
-        this.playAnim('jump', true)
+        this.playAnim(JUMP_INFO.animKey, true)
         this.scene.time.delayedCall(SPIN_TIMEOUT_MS, this.enableSpin, [], this)
     }
 
@@ -740,5 +723,39 @@ export default class SwordHero {
             duration: SPIN_DURATION_MS,
             onComplete: () => { self.spinning = false }
         })
+    }
+}
+
+class HeroStatus {
+    /** @type{string} */ position
+    /** @type{string} */ action
+
+    /**
+     * Creates a hero status instance based on its current position & action
+     * @param {string} position Hero positioning
+     * @param {string} action Hero current action
+     */
+    constructor(position = 'STANDING', action = 'NONE') {
+        this.position = position
+        this.action = action
+    }
+
+    static TAKING_DAMAGE = 'TAKING_DAMAGE'
+    static STANDING = 'STANDING'
+    static FLOATING = 'FLOATING'
+    static ATTACKING = 'ATTACKING'
+    static SPINNING = 'SPINNING'
+    static NONE = 'NONE'
+
+    /**
+     * 
+     * @param {SwordHero} hero Sword hero reference
+     * @returns 
+     */
+    static parseStatus(hero) {
+        return new HeroStatus(
+            hero.takingDamage ? this.TAKING_DAMAGE : hero.blockedDown() ? this.STANDING : this.FLOATING,
+            hero.attacking ? this.ATTACKING : hero.spinning ? this.SPINNING : this.NONE
+        )
     }
 }
